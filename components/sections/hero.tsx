@@ -3,8 +3,10 @@
 import { FunctionDeck } from "@/components/sections/function-deck";
 import { Button } from "@/components/ui/button";
 import { DEMO_HREF } from "@/lib/nav-data";
+import { openSync } from "fs";
 import { MoveRight } from "lucide-react";
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
+import { interpolate, motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
+import { section } from "motion/react-client";
 import Link from "next/link";
 import { useRef } from "react";
 
@@ -83,7 +85,7 @@ export function Hero() {
           </Button>
         </div>
 
-        <FunctionDeck className="mx-auto max-w-md lg:max-w-none" />
+        <FunctionDeck className="mx-auto max-w-[440px] lg:mr-0" />
       </motion.div>
     </section>
   );

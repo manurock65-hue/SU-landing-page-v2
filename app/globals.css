@@ -9,6 +9,18 @@
 @theme {
   --animate-marquee-right: marquee-right 45s linear infinite;
 
+  /* Partner orbit: rings turn one way, each logo counter-turns to stay upright. */
+  --animate-orbit: orbit 60s linear infinite;
+  --animate-orbit-reverse: orbit 60s linear infinite reverse;
+  --animate-orbit-slow: orbit 90s linear infinite reverse;
+  --animate-orbit-slow-reverse: orbit 90s linear infinite;
+
+  @keyframes orbit {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   @keyframes marquee-right {
     from {
       transform: translateX(-50%);
@@ -19,18 +31,13 @@
   }
 }
 
-/* Architecture flow: a pulse travelling down the arrow into the active tier. */
-@keyframes flow-pulse {
+/* Architecture journey: a light sweep across the layer currently processing the ticket. */
+@keyframes band-scan {
   from {
-    top: 0%;
-    opacity: 0;
-  }
-  25% {
-    opacity: 1;
+    transform: translateX(-100%);
   }
   to {
-    top: 100%;
-    opacity: 0;
+    transform: translateX(300%);
   }
 }
 
@@ -42,6 +49,48 @@
   to {
     transform: scaleY(1);
   }
+}
+
+/* Footer wordmark "AI" hover: a multi-hue gradient that keeps flowing through the letters. */
+.ai-flow-text {
+  background-image: linear-gradient(90deg, #005be2, #06b6d4, #a78bfa, #ff7400, #005be2);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ai-flow 5s linear infinite;
+}
+
+@keyframes ai-flow {
+  to {
+    background-position: 300% 0;
+  }
+}
+
+/* Recognition cards: a conic glow on the border that points at the cursor
+   (pattern from Aceternity's "Glowing Effect" on 21st.dev). The card sets
+   --glow-angle (deg) and --glow-on (0/1); the mask keeps only the 1.5px ring. */
+.glow-border {
+  padding: 1.5px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from calc((var(--glow-angle, 0) - 40) * 1deg),
+    transparent 0deg,
+    #22d3ee 22deg,
+    #3b82f6 40deg,
+    #a78bfa 58deg,
+    transparent 80deg
+  );
+  opacity: var(--glow-on, 0);
+  transition: opacity 300ms ease;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
 }
 
 @theme inline {
@@ -102,12 +151,13 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   /* Calls to action use the logo orange; the rest of the theme stays blue.
-     Contrast (WCAG AA needs 4.5:1): white text on #ff7400 is only ~2.8:1, so
-     CTA text is dark navy (~7:1). Text links use a deeper orange on white
+     CTA text is white by design decision (2026-09-29). Note: white on #ff7400
+     is ~2.8:1, below WCAG AA's 4.5:1 for normal text — hover darkens the
+     orange so it never gets lower. Text links use a deeper orange on white
      (5.2:1) and the logo orange on the dark navy band (~7:1). */
   --cta: #ff7400;
-  --cta-hover: #ff8a26;
-  --cta-foreground: #0b1220;
+  --cta-hover: #e86600;
+  --cta-foreground: #ffffff;
   --link: #c2410c;
   --link-on-dark: #ff8a3d;
 

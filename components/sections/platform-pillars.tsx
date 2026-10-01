@@ -96,7 +96,7 @@ export function PlatformPillars() {
   };
 
   return (
-    <section ref={sectionRef} aria-labelledby="pillars-heading" className="bg-white py-24 sm:py-32">
+    <section ref={sectionRef} aria-labelledby="pillars-heading" className="bg-white pb-24 pt-10 sm:pb-32 sm:pt-14">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-block rounded-full bg-[#005be2]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#005be2]">

@@ -2,9 +2,18 @@ import { AgentFunctions } from "@/components/sections/agent-functions";
 import { AgentSuite } from "@/components/sections/agent-suite";
 import { ArchStack } from "@/components/sections/arch-stack";
 import { Clients } from "@/components/sections/clients";
+import { Faq } from "@/components/sections/faq";
 import { Hero } from "@/components/sections/hero";
+import { Partners } from "@/components/sections/partners";
 import { PlatformPillars } from "@/components/sections/platform-pillars";
+import { Recognitions } from "@/components/sections/recognitions";
+import { Resources } from "@/components/sections/resources";
+import { SiteFooter } from "@/components/sections/site-footer";
+import { SuccessStories } from "@/components/sections/success-stories";
+import { SupportOutcomes } from "@/components/sections/support-outcomes";
+import { TransformCta } from "@/components/sections/transform-cta";
 import { Header1 } from "@/components/ui/header";
+import { SectionAssistant } from "@/components/ui/section-assistant";
 
 export default function Home() {
   return (
@@ -28,7 +37,17 @@ export default function Home() {
           <AgentSuite />
           <ArchStack />
         </div>
+
+        <SupportOutcomes />
+        <SuccessStories />
+        <Recognitions />
+        <TransformCta />
+        <Resources />
+        <Partners />
+        <Faq />
       </main>
+      <SiteFooter />
+      <SectionAssistant />
     </>
   );
 }

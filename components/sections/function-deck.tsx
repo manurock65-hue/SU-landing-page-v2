@@ -7,10 +7,10 @@ import { motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 // Hero deck — one card per business function. The front card plays its agent
-// run, then drops, tucks behind the stack and rises into the back slot while
-// the rest step forward. Pauses on hover/focus and while off screen.
+// run, then swipes out to the left and fades while the rest step forward; it
+// re-enters invisibly at the back. Pauses on hover/focus and while off screen.
 const SHUFFLE_MS = 5600; // 3 steps × 1.1s + time to read the result
-const TUCK_MS = 360; // how long the leaving card stays in front while dropping
+const TUCK_MS = 480; // how long the leaving card takes to swipe out
 const PEEK = 16; // px each card behind peeks out above the one in front
 const VISIBLE = 4; // cards drawn behind the front one fade out past this depth
 
@@ -65,8 +65,9 @@ export function FunctionDeck({ className }: { className?: string }) {
             initial={false}
             animate={
               tucking
-                ? { y: 150, scale: 0.96, rotate: -3, opacity: 1 }
+                ? { x: -140, y: 24, scale: 0.94, rotate: -9, opacity: 0 }
                 : {
+                    x: 0,
                     y: -shown * PEEK,
                     scale: 1 - shown * 0.05,
                     rotate: 0,
@@ -75,7 +76,7 @@ export function FunctionDeck({ className }: { className?: string }) {
             }
             transition={
               tucking
-                ? { duration: TUCK_MS / 1000, ease: [0.4, 0, 1, 1] }
+                ? { duration: TUCK_MS / 1000, ease: [0.4, 0, 0.2, 1] }
                 : { type: "spring", stiffness: 210, damping: 26, mass: 0.9 }
             }
             style={{ zIndex: tucking ? 60 : 50 - depth, transformOrigin: "50% 0%" }}

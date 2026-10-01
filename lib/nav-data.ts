@@ -2,12 +2,12 @@
 // (captured 23 Sep 2026). Labels and destinations match the live site;
 // _gl / utm tracking params are stripped per the redesign PRD.
 
-const SITE = "https://www.searchunify.com";
+export const SITE = "https://www.searchunify.com";
 
 // Resource Center filters on the live site are query-string URLs. Kept as-is
 // so links keep working until the new clean /resources/... URLs exist.
 const RC_UID = "138a0c28-5680-11f0-9274-0242ac120012";
-function resourceCenter(type: string) {
+export function resourceCenter(type: string) {
   const aggregations = encodeURIComponent(
     JSON.stringify([{ type: "_index", filter: [type] }]),
   );

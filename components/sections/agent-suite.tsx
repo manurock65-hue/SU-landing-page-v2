@@ -177,8 +177,8 @@ function PinnedJourney() {
   };
 
   return (
-    <div ref={ref} className="relative mt-10 h-[320vh]">
-      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-clip pt-20">
+    <div ref={ref} className="relative mt-4 h-[320vh]">
+      <div className="sticky top-0 flex h-screen flex-col justify-start overflow-clip pt-28">
         <div className="mx-auto mb-8 flex w-full max-w-7xl items-center gap-4 px-6">
           <ol className="flex flex-wrap gap-2" aria-label="Support journey stages">
             {STAGES.map((s, i) => (
