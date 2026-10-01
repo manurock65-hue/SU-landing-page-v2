@@ -3,10 +3,8 @@
 import { FunctionDeck } from "@/components/sections/function-deck";
 import { Button } from "@/components/ui/button";
 import { DEMO_HREF } from "@/lib/nav-data";
-import { openSync } from "fs";
 import { MoveRight } from "lucide-react";
-import { interpolate, motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
-import { section } from "motion/react-client";
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 import Link from "next/link";
 import { useRef } from "react";
 

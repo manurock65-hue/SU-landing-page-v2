@@ -207,9 +207,12 @@ function useTyped(text: string, active: boolean, speed = 45) {
   const [n, setN] = useState(0);
   useEffect(() => {
     if (!active) return;
-    setN(0);
     const t = setInterval(() => setN((c) => (c >= text.length ? c : c + 1)), speed);
-    return () => clearInterval(t);
+    // Reset on the way out so the next run types from the first letter.
+    return () => {
+      clearInterval(t);
+      setN(0);
+    };
   }, [active, text, speed]);
   return active ? text.slice(0, n) : text;
 }

@@ -24,6 +24,10 @@ type Message =
   | { id: number; kind: "full"; section: SectionSummary; lines: string[] }
   | { id: number; kind: "answer"; query: string; snippets: Snippet[]; terms: string[] };
 
+// Omit applied to each member of the union (plain Omit collapses it).
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
+type NewMessage = DistributiveOmit<Message, "id">;
+
 type Registered = { section: SectionSummary; el: HTMLElement };
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -95,8 +99,15 @@ function Highlight({ text, terms }: { text: string; terms: string[] }) {
 
 /* ------------------------------------------------------------- assistant */
 
+// The page's summarizable sections, read from the DOM (each heading's <section>).
+function findSections(): Registered[] {
+  return SECTION_SUMMARIES.flatMap((section) => {
+    const el = document.getElementById(section.id)?.closest("section");
+    return el ? [{ section, el: el as HTMLElement }] : [];
+  });
+}
+
 export function SectionAssistant() {
-  const [regs, setRegs] = useState<Registered[]>([]);
   const [hover, setHover] = useState<{ id: string; top: number } | null>(null);
   const [open, setOpen] = useState(false);
   const [context, setContext] = useState<string | null>(null);
@@ -107,12 +118,8 @@ export function SectionAssistant() {
 
   // Find each section and track which one the pointer is over.
   useEffect(() => {
-    const list = SECTION_SUMMARIES.flatMap((section) => {
-      const el = document.getElementById(section.id)?.closest("section");
-      return el ? [{ section, el: el as HTMLElement }] : [];
-    });
-    setRegs(list);
     if (!window.matchMedia("(hover: hover)").matches) return;
+    const list = findSections();
 
     let raf = 0;
     let point: { x: number; y: number } | null = null;
@@ -150,7 +157,7 @@ export function SectionAssistant() {
     };
   }, []);
 
-  const push = useCallback((...m: Omit<Message, "id">[]) => {
+  const push = useCallback((...m: NewMessage[]) => {
     setMessages((prev) => [...prev, ...m.map((x) => ({ ...x, id: nextId.current++ }) as Message)]);
   }, []);
 
@@ -170,25 +177,26 @@ export function SectionAssistant() {
 
   const readFull = useCallback(
     (section: SectionSummary) => {
-      const reg = regs.find((r) => r.section.id === section.id);
+      const reg = findSections().find((r) => r.section.id === section.id);
       if (!reg) return;
       push({ kind: "user", text: `Read the full "${section.title}" section` }, { kind: "full", section, lines: readLines(reg.el) });
     },
-    [regs, push],
+    [push],
   );
 
   const ask = useCallback(
     (q: string) => {
-      const pool = context ? regs.filter((r) => r.section.id === context) : regs;
+      const all = findSections();
+      const pool = context ? all.filter((r) => r.section.id === context) : all;
       const { snippets, terms } = retrieve(q, pool);
       push({ kind: "user", text: q }, { kind: "answer", query: q, snippets, terms });
     },
-    [context, regs, push],
+    [context, push],
   );
 
   // Lines from the current section that carry a figure (%, $, counts, years).
   const keyNumbers = useCallback(() => {
-    const reg = regs.find((r) => r.section.id === context);
+    const reg = findSections().find((r) => r.section.id === context);
     if (!reg) return;
     const snippets = readLines(reg.el)
       .filter((l) => /\d/.test(l) && l.length > 6)
@@ -198,7 +206,7 @@ export function SectionAssistant() {
       { kind: "user", text: `Key numbers in "${reg.section.title}"` },
       { kind: "answer", query: reg.section.title, snippets, terms: [] },
     );
-  }, [context, regs, push]);
+  }, [context, push]);
 
   const close = useCallback(() => {
     setOpen(false);
