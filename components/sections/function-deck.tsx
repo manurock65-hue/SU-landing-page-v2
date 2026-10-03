@@ -20,6 +20,10 @@ export function FunctionDeck({ className }: { className?: string }) {
   const inView = useInView(ref, { amount: 0.4 });
   const [order, setOrder] = useState(() => HERO_EXAMPLES.map((_, i) => (i + HERO_DEFAULT_INDEX) % HERO_EXAMPLES.length));
   const [leaving, setLeaving] = useState<number | null>(null);
+  // Bumped each time a card finishes tucking out and settles at the back —
+  // changing its key forces a clean remount instead of springing in from
+  // wherever the tuck-out animation left it (that was the reappear glitch).
+  const [resetKeys, setResetKeys] = useState<number[]>(() => HERO_EXAMPLES.map(() => 0));
   const [paused, setPaused] = useState(false);
 
   const top = order[0];
@@ -36,56 +40,97 @@ export function FunctionDeck({ className }: { className?: string }) {
 
   useEffect(() => {
     if (leaving === null) return;
-    const t = setTimeout(() => setLeaving(null), TUCK_MS);
+    const t = setTimeout(() => {
+      setResetKeys((keys) => keys.map((k, idx) => (idx === leaving ? k + 1 : k)));
+      setLeaving(null);
+    }, TUCK_MS);
     return () => clearTimeout(t);
   }, [leaving]);
 
-  return (
-    <div
-      ref={ref}
-      role="region"
-      aria-roledescription="carousel"
-      aria-label="Live SearchUnify agent examples"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      // Card height plus room for the cards peeking out above it.
-      className={cn("relative h-[480px] w-full", className)}
-    >
-      {HERO_EXAMPLES.map((fn, i) => {
-        const depth = order.indexOf(i);
-        const isTop = depth === 0;
-        const tucking = leaving === i;
-        const shown = Math.min(depth, VISIBLE);
+  // Manual jump (dots): rotate whichever card is clicked straight to the
+  // front. No tuck-out needed — the spring reflow reads fine on its own.
+  const goTo = (i: number) => {
+    setOrder((o) => {
+      const idx = o.indexOf(i);
+      return [...o.slice(idx), ...o.slice(0, idx)];
+    });
+    setLeaving(null);
+  };
 
-        return (
-          <motion.div
-            key={fn.name}
-            aria-hidden={!isTop}
-            inert={!isTop}
-            initial={false}
-            animate={
-              tucking
-                ? { x: -140, y: 24, scale: 0.94, rotate: -9, opacity: 0 }
-                : {
-                    x: 0,
-                    y: -shown * PEEK,
-                    scale: 1 - shown * 0.05,
-                    rotate: 0,
-                    opacity: depth >= VISIBLE ? 0 : 1,
-                  }
-            }
-            transition={
-              tucking
-                ? { duration: TUCK_MS / 1000, ease: [0.4, 0, 0.2, 1] }
-                : { type: "spring", stiffness: 210, damping: 26, mass: 0.9 }
-            }
-            style={{ zIndex: tucking ? 60 : 50 - depth, transformOrigin: "50% 0%" }}
-            className="absolute inset-x-0 bottom-0 will-change-transform"
-          >
-            <DeckCard fn={fn} active={isTop} playing={isTop && inView} dim={!isTop && !tucking} countdown={isTop && autoplay} />
-          </motion.div>
-        );
-      })}
+  return (
+    <div className={cn("w-full", className)}>
+      <div
+        ref={ref}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Live SearchUnify agent examples"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        // Card height plus room for the cards peeking out above it.
+        className="relative h-[600px] w-full"
+      >
+        {HERO_EXAMPLES.map((fn, i) => {
+          const depth = order.indexOf(i);
+          const isTop = depth === 0;
+          const tucking = leaving === i;
+          const shown = Math.min(depth, VISIBLE);
+          const settled = {
+            x: 0,
+            y: -shown * PEEK,
+            scale: 1 - shown * 0.05,
+            rotate: 0,
+            opacity: depth >= VISIBLE ? 0 : 1,
+          };
+
+          return (
+            <motion.div
+              key={`${fn.name}-${resetKeys[i]}`}
+              aria-hidden={!isTop}
+              inert={!isTop}
+              // Every mount (first paint, or a fresh key after tucking out)
+              // starts from "just behind the stack, invisible" so a card
+              // only ever animates a short distance into place — never a
+              // long cross-screen jump.
+              initial={{ x: 0, y: -VISIBLE * PEEK, scale: 1 - VISIBLE * 0.05, rotate: 0, opacity: 0 }}
+              animate={tucking ? { x: -40, y: 10, scale: 0.92, rotate: -4, opacity: 0 } : settled}
+              transition={
+                tucking
+                  ? { duration: TUCK_MS / 1000, ease: [0.4, 0, 0.2, 1] }
+                  : { type: "spring", stiffness: 210, damping: 26, mass: 0.9 }
+              }
+              style={{ zIndex: tucking ? 60 : 50 - depth, transformOrigin: "50% 0%" }}
+              className="absolute inset-x-0 bottom-0 will-change-transform"
+            >
+              <DeckCard fn={fn} active={isTop} playing={isTop && inView} dim={!isTop && !tucking} countdown={isTop && autoplay} />
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Manual jump dots. */}
+      <div role="tablist" aria-label="Choose an example" className="mt-5 flex items-center justify-center gap-2">
+        {HERO_EXAMPLES.map((fn, i) => {
+          const isTop = order[0] === i;
+          return (
+            <button
+              key={fn.name}
+              type="button"
+              role="tab"
+              aria-selected={isTop}
+              aria-label={fn.name}
+              onClick={() => goTo(i)}
+              className="group p-1.5 focus-visible:outline-none"
+            >
+              <span
+                className={cn(
+                  "block h-1.5 rounded-full transition-all duration-300",
+                  isTop ? "w-6 bg-[#005be2]" : "w-1.5 bg-slate-300 group-hover:bg-slate-400",
+                )}
+              />
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -106,15 +151,15 @@ function DeckCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-3xl border bg-white p-6 text-left transition-[border-color,box-shadow] duration-500",
+        "relative overflow-hidden rounded-[1.75rem] border bg-white text-left transition-[border-color,box-shadow] duration-500",
         active
-          ? "border-slate-200 shadow-[0_32px_64px_-28px_rgba(15,23,42,0.28),0_0_0_1px_rgba(0,91,226,0.04)]"
-          : "border-slate-200/80 shadow-[0_12px_32px_-20px_rgba(15,23,42,0.2)]",
+          ? "border-slate-200 shadow-[0_40px_80px_-32px_rgba(15,23,42,0.32),0_0_0_1px_rgba(0,91,226,0.04)]"
+          : "border-slate-200/80 shadow-[0_14px_36px_-22px_rgba(15,23,42,0.2)]",
       )}
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-24 -top-28 size-72 rounded-full bg-[#005be2] opacity-[0.07] blur-3xl"
+        className="pointer-events-none absolute -right-28 -top-32 size-80 rounded-full bg-[#005be2] opacity-[0.07] blur-3xl"
       />
       {/* Cards behind the front one fade toward the page so the stack reads as depth. */}
       <div
@@ -125,45 +170,55 @@ function DeckCard({
         )}
       />
 
-      <div className="relative flex items-center gap-3">
-        <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#005be2]/10 text-[#005be2]">
-          <fn.icon className="size-5" />
-        </span>
-        <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Live example</p>
-          <h3 className="truncate text-xl font-semibold text-slate-950">{fn.name}</h3>
-        </div>
+      {/* Window chrome — frames this as a live product screen. */}
+      <div className="relative flex items-center gap-1.5 border-b border-slate-100 px-6 py-3.5">
+        <span className="size-2.5 rounded-full bg-rose-300" />
+        <span className="size-2.5 rounded-full bg-amber-300" />
+        <span className="size-2.5 rounded-full bg-emerald-300" />
+        <span className="ml-3 truncate font-mono text-[11px] text-slate-400">searchunify.app</span>
         <span className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700 ring-1 ring-emerald-500/20">
           <span className="size-1.5 animate-pulse rounded-full bg-emerald-500 motion-reduce:animate-none" />
           Agent live
         </span>
       </div>
 
-      <p className="relative mt-4 line-clamp-2 text-sm leading-relaxed text-slate-600">{fn.description}</p>
+      <div className="relative p-7">
+        <div className="flex items-start gap-4">
+          <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#005be2] to-[#06b6d4] text-white shadow-[0_10px_24px_-8px_rgba(0,91,226,0.6)]">
+            <fn.icon className="size-7" />
+          </span>
+          <div className="min-w-0 pt-0.5">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#005be2]">Live example</p>
+            <h3 className="mt-1 text-2xl font-bold leading-tight text-slate-950">{fn.name}</h3>
+          </div>
+        </div>
 
-      <div className="relative mt-5 rounded-2xl border border-slate-200 bg-slate-50/80 p-5">
-        <p className="mb-4 truncate border-b border-slate-200 pb-3 font-mono text-xs text-[#0b3aa8]">{fn.trigger}</p>
-        {/* Remount when the card reaches the front so its run starts from step one. */}
-        <AgentLog
-          key={active ? "front" : "back"}
-          steps={fn.steps}
-          result={fn.result}
-          playing={playing}
-          tone="light"
-          className="min-h-[150px]"
-        />
-      </div>
+        <p className="relative mt-5 line-clamp-2 text-[15px] leading-relaxed text-slate-600">{fn.description}</p>
 
-      {/* Countdown to the next shuffle. */}
-      <div aria-hidden="true" className="relative mt-5 h-1 overflow-hidden rounded-full bg-slate-100">
-        {countdown && (
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: SHUFFLE_MS / 1000, ease: "linear" }}
-            className="h-full origin-left rounded-full bg-gradient-to-r from-[#005be2] to-[#06b6d4]"
+        <div className="relative mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/80 p-6">
+          <p className="mb-5 truncate border-b border-slate-200 pb-4 font-mono text-[13px] text-[#0b3aa8]">{fn.trigger}</p>
+          {/* Remount when the card reaches the front so its run starts from step one. */}
+          <AgentLog
+            key={active ? "front" : "back"}
+            steps={fn.steps}
+            result={fn.result}
+            playing={playing}
+            tone="light"
+            className="min-h-[170px] text-[13.5px]"
           />
-        )}
+        </div>
+
+        {/* Countdown to the next shuffle. */}
+        <div aria-hidden="true" className="relative mt-6 h-1 overflow-hidden rounded-full bg-slate-100">
+          {countdown && (
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: SHUFFLE_MS / 1000, ease: "linear" }}
+              className="h-full origin-left rounded-full bg-gradient-to-r from-[#005be2] to-[#06b6d4]"
+            />
+          )}
+        </div>
       </div>
     </div>
   );

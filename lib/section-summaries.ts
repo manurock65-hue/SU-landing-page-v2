@@ -10,22 +10,6 @@ export type SectionSummary = {
 
 export const SECTION_SUMMARIES: SectionSummary[] = [
   {
-    id: "clients-heading",
-    title: "Our Esteemed Clients",
-    summary: "SearchUnify is used by global enterprises across software, security, healthcare and industrial sectors.",
-    points: ["Customers include Netskope, Fortinet, Flexera, Reltio, Rubrik, Cornerstone and nCino", "20+ enterprise brands rely on it for customer support"],
-  },
-  {
-    id: "stories-heading",
-    title: "Real conversations. Real outcomes.",
-    summary: "SearchUnify Customer Pulse — video conversations with customers on what changed after deploying the harness.",
-    points: [
-      "GlobalFoundries: seamless self-service, one place for engineers to find the answer",
-      "TechnologyOne: 76% case deflection with SearchUnify AI-powered support",
-      "Revenera and Celonis report faster resolution and unified knowledge visibility",
-    ],
-  },
-  {
     id: "recognitions-heading",
     title: "Industry recognition",
     summary: "Leading analysts consistently recognize SearchUnify for enterprise search and knowledge management.",

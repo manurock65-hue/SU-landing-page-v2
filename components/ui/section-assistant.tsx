@@ -1,6 +1,6 @@
 "use client";
 
-import { DEMO_HREF, siteSearchUrl } from "@/lib/nav-data";
+import { DEMO_HREF, docsSearchUrl, siteSearchUrl } from "@/lib/nav-data";
 import { SECTION_SUMMARIES, type SectionSummary } from "@/lib/section-summaries";
 import { cn } from "@/lib/utils";
 import { ArrowUp, BookOpenText, CornerDownRight, Hash, MoveRight, Search, Sparkles, X } from "lucide-react";
@@ -433,9 +433,12 @@ function Panel({
           </div>
         </form>
 
-        <div className="mt-2 flex items-center justify-between gap-3 px-1 text-[11px] text-slate-400">
-          <span>Answers quote this page.</span>
-          <Link href={DEMO_HREF} className="group inline-flex items-center gap-1 font-semibold text-link hover:underline">
+        <div className="mt-2.5 flex items-center justify-between gap-3 px-1">
+          <span className="text-[11px] text-slate-400">Answers quote this page.</span>
+          <Link
+            href={DEMO_HREF}
+            className="group inline-flex shrink-0 items-center gap-1.5 rounded-full bg-cta px-3.5 py-1.5 text-xs font-semibold text-cta-foreground shadow-[0_6px_16px_-6px_rgba(255,116,0,0.6)] transition-colors hover:bg-cta-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cta/50"
+          >
             Book a Demo <MoveRight className="size-3 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
@@ -584,16 +587,31 @@ function AnswerMessage({ query, snippets, terms, onClose }: { query: string; sni
           ))}
         </ul>
       ) : (
-        <p>I couldn&apos;t find that in this section.</p>
+        <p>
+          I couldn&apos;t find that in this section — but SearchUnify&apos;s own documentation likely covers it in
+          more depth.
+        </p>
       )}
-      <a
-        href={siteSearchUrl(query)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#005be2] hover:underline"
-      >
-        <Search className="size-3.5" /> Search searchunify.com for “{query}”
-      </a>
+      <div className="mt-3 flex flex-col items-start gap-2">
+        {!snippets.length && (
+          <a
+            href={docsSearchUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#005be2] hover:underline"
+          >
+            <BookOpenText className="size-3.5" /> Search the SearchUnify docs for “{query}”
+          </a>
+        )}
+        <a
+          href={siteSearchUrl(query)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-[#005be2] hover:underline"
+        >
+          <Search className="size-3.5" /> Search searchunify.com for “{query}”
+        </a>
+      </div>
     </Card>
   );
 }

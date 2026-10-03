@@ -1,6 +1,7 @@
 "use client";
 
 import { FunctionDeck } from "@/components/sections/function-deck";
+import { AgentNetworkBackground } from "@/components/ui/agent-network-background";
 import { Button } from "@/components/ui/button";
 import { CONTACT_HREF, DEMO_HREF } from "@/lib/nav-data";
 import { MoveRight } from "lucide-react";
@@ -31,6 +32,7 @@ export function Hero() {
       ref={ref}
       className="relative flex min-h-[calc(100svh-200px)] items-center justify-center overflow-hidden bg-white px-6 pb-24 pt-36 text-center"
     >
+      <AgentNetworkBackground />
       <motion.div
         aria-hidden="true"
         style={{ y: glowY }}

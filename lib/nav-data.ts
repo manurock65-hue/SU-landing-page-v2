@@ -3,6 +3,13 @@
 // _gl / utm tracking params are stripped per the redesign PRD.
 
 export const SITE = "https://www.searchunify.com";
+export const DOCS_SITE = "https://docs.searchunify.com";
+
+// The docs site's search page — no confirmed query-param deep-link format,
+// so this opens the search page itself rather than guessing a broken one.
+export function docsSearchUrl() {
+  return `${DOCS_SITE}/Search.htm`;
+}
 
 // Resource Center filters on the live site are query-string URLs. Kept as-is
 // so links keep working until the new clean /resources/... URLs exist.

@@ -1,5 +1,6 @@
 "use client";
 
+import { DotGridBackground } from "@/components/ui/dot-grid-background";
 import { cn } from "@/lib/utils";
 import { Bot, CheckCircle2, FileCheck2, HelpCircle, MessageSquareText, Users, Wrench, Workflow, type LucideIcon } from "lucide-react";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
@@ -94,8 +95,9 @@ export function TheGap() {
   const Icon = onMarket ? pair.marketIcon : pair.usIcon;
 
   return (
-    <section aria-labelledby="gap-heading" className="bg-slate-50 px-6 py-24 sm:py-32">
-      <div className="mx-auto max-w-3xl text-center">
+    <section aria-labelledby="gap-heading" className="relative overflow-hidden bg-slate-50 px-6 py-24 sm:py-32">
+      <DotGridBackground />
+      <div className="relative mx-auto max-w-3xl text-center">
         <span className="inline-block rounded-full bg-[#005be2]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#005be2]">
           The gap
         </span>
