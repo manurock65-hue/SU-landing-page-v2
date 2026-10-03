@@ -1,7 +1,7 @@
 "use client";
 
 import { AgentLog } from "@/components/sections/agent-log";
-import { FUNCTIONS } from "@/lib/functions-data";
+import { HERO_EXAMPLES } from "@/lib/functions-data";
 import { CONTACT_HREF, DEMO_HREF } from "@/lib/nav-data";
 import { cn } from "@/lib/utils";
 import { MonitorPlay, MoveRight } from "lucide-react";
@@ -20,14 +20,17 @@ export function TransformCta() {
       <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-1/4 -z-10 h-80 w-[48rem] rounded-full bg-[#ff7400] opacity-[0.12] blur-[140px]" />
       <div aria-hidden="true" className="pointer-events-none absolute right-0 top-1/3 -z-10 h-80 w-[36rem] rounded-full bg-cyan-400 opacity-[0.08] blur-[140px]" />
 
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <h2 id="transform-heading" className="max-w-2xl text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl">
-          Begin Your{" "}
+      <div className="mx-auto max-w-7xl">
+        <h2 id="transform-heading" className="text-balance text-4xl font-bold tracking-tight text-white sm:text-5xl lg:whitespace-nowrap lg:text-6xl">
+          Bring your{" "}
           <span className="bg-gradient-to-r from-[#ff8a3d] via-[#ffb26b] to-[#22d3ee] bg-clip-text text-transparent">
-            AI Transformation
+            hardest ticket.
           </span>
         </h2>
-        <p className="max-w-sm text-pretty text-lg text-slate-400">See the agents at work, or map them to your own use case with our team.</p>
+        <p className="mt-4 max-w-xl text-pretty text-lg text-slate-400">
+          Not a canned demo. Bring a real case your current tooling can&apos;t resolve, and we&apos;ll connect a
+          sandbox to your knowledge and watch the agent retrieve, cite, and answer it live.
+        </p>
       </div>
 
       <div className="mx-auto mt-14 grid max-w-7xl gap-5 lg:grid-cols-12">
@@ -56,8 +59,8 @@ export function TransformCta() {
 
 /* ------------------------------------------------------------------ demo */
 
-// Three agents the demo window rotates through.
-const DEMO_FNS = ["Customer Support", "IT", "Sales"].map((n) => FUNCTIONS.find((f) => f.name === n)!);
+// The three live examples the demo window rotates through.
+const DEMO_FNS = HERO_EXAMPLES;
 const DEMO_MS = 6000;
 
 function DemoCard() {
@@ -66,7 +69,8 @@ function DemoCard() {
   const reduceMotion = useReducedMotion();
   const [active, setActive] = useState(0);
   const [picked, setPicked] = useState(false);
-  const cycling = inView && !picked && !reduceMotion;
+  const [hovered, setHovered] = useState(false);
+  const cycling = inView && !picked && !hovered && !reduceMotion;
   const fn = DEMO_FNS[active];
 
   useEffect(() => {
@@ -104,7 +108,11 @@ function DemoCard() {
       </div>
 
       {/* Product window */}
-      <div className="relative mt-8 flex-1 overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className="relative mt-8 flex-1 overflow-hidden rounded-2xl border border-white/10 bg-black/40 transition-[border-color] duration-300 hover:border-white/20"
+      >
         <div className="flex items-center gap-1 border-b border-white/5 px-2 pt-2" role="tablist" aria-label="Agent to preview">
           {DEMO_FNS.map((f, i) => {
             const on = i === active;
@@ -119,7 +127,7 @@ function DemoCard() {
                   setPicked(true);
                 }}
                 className={cn(
-                  "relative flex items-center gap-2 rounded-t-xl px-3.5 py-2.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-300/60",
+                  "relative flex items-center gap-2 rounded-t-xl px-3.5 py-2.5 text-xs font-semibold transition-all duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-300/60",
                   on ? "bg-white/[0.06] text-white" : "text-slate-500 hover:text-slate-200",
                 )}
               >
@@ -138,12 +146,12 @@ function DemoCard() {
               </button>
             );
           })}
-          <span className="ml-auto flex items-center gap-1.5 pr-3 text-[11px] font-medium text-emerald-300">
+          <span className={cn("ml-auto flex items-center gap-1.5 pr-3 text-[11px] font-medium transition-colors duration-200", hovered ? "text-[#ff8a3d]" : "text-emerald-300")}>
             <span className="relative flex size-1.5">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-70 motion-reduce:animate-none" />
-              <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
+              {!hovered && <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-70 motion-reduce:animate-none" />}
+              <span className={cn("relative inline-flex size-1.5 rounded-full", hovered ? "bg-[#ff8a3d]" : "bg-emerald-400")} />
             </span>
-            Live
+            {hovered ? "Paused · click a tab" : "Live"}
           </span>
         </div>
 
@@ -299,12 +307,13 @@ function ExpertCard() {
 
       <Link
         href={CONTACT_HREF}
-        className="group relative mt-6 inline-flex items-center justify-between gap-3 rounded-full bg-slate-950 py-2 pl-6 pr-2 text-sm font-semibold text-white transition-colors hover:bg-[#005be2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#005be2]/50"
+        className="group relative mt-6 flex items-center justify-between gap-3 rounded-full bg-[#005be2] py-2.5 pl-6 pr-2 text-white shadow-[0_12px_32px_-10px_rgba(0,91,226,0.7)] transition-colors hover:bg-[#0047bd] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#005be2]/50"
       >
-        <span className="truncate">
-          Talk to an Expert <span className="font-normal text-white/60">· {t.label.toLowerCase()}</span>
+        <span className="min-w-0">
+          <span className="block text-sm font-bold leading-tight">Talk to an Expert</span>
+          <span className="block truncate text-xs text-white/80">· {t.label}</span>
         </span>
-        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/10 transition-transform duration-300 group-hover:translate-x-0.5">
+        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/15 transition-transform duration-300 group-hover:translate-x-0.5">
           <MoveRight className="size-4" />
         </span>
       </Link>

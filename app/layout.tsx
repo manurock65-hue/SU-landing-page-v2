@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SearchUnify | Agentic AI for Enterprise Customer Support",
+  title: "SearchUnify | AI Support Agents That Don't Bluff",
   description:
-    "SearchUnify unifies your enterprise knowledge and powers AI agents that resolve customer support, end to end.",
+    "Every SearchUnify agent retrieves from your CRM, ticketing, knowledge base, docs, community and telemetry before it acts, shows what it found, and hands off when it can't. No source, no action.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

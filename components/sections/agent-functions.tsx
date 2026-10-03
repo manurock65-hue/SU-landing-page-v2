@@ -1,7 +1,7 @@
 "use client";
 
 import { AgentLog } from "@/components/sections/agent-log";
-import { FUNCTIONS, SUPPORT_INDEX as DEFAULT } from "@/lib/functions-data";
+import { AGENT_TYPES, AGENT_DEFAULT_INDEX as DEFAULT } from "@/lib/functions-data";
 import { useIsDesktop } from "@/lib/use-is-desktop";
 import { cn } from "@/lib/utils";
 import { useInView } from "motion/react";
@@ -28,10 +28,10 @@ export function AgentFunctions() {
           Agents at work
         </span>
         <h2 id="functions-heading" className="mt-5 text-balance text-4xl font-bold tracking-tight text-white sm:text-5xl">
-          AI Agents Engineered for Your Business Functions
+          Purpose-built AI Agents
         </h2>
         <p className="mt-5 text-pretty text-lg text-slate-400">
-          Hover a team to watch its agent pick up a task and close it out.
+          Not one mega-bot. Hover an agent to watch it pick up a case and close it out.
         </p>
       </div>
 
@@ -39,7 +39,7 @@ export function AgentFunctions() {
         ref={ref}
         className="mx-auto mt-14 flex max-w-7xl flex-col gap-2 lg:h-[30rem] lg:flex-row"
       >
-        {FUNCTIONS.map((f, i) => {
+        {AGENT_TYPES.map((f, i) => {
           const isActive = i === active;
           return (
             <div

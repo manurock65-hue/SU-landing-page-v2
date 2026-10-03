@@ -2,312 +2,109 @@
 
 import { useIsDesktop } from "@/lib/use-is-desktop";
 import { cn } from "@/lib/utils";
-import { Check, Workflow, BrainCircuit, Cable, Layers, Building2, type LucideIcon } from "lucide-react";
 import {
-  AnimatePresence,
-  motion,
-  useMotionValueEvent,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "motion/react";
-import { useRef, useState } from "react";
+  BookOpenCheck,
+  BrainCircuit,
+  Database,
+  Radio,
+  Search,
+  ShieldCheck,
+  Workflow,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
+import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 
-// Chapter 5 — "SearchUnify Agentic AI Suite Architecture", told as one ticket's
-// journey through the stack. On desktop the section pins: scrolling moves a
-// glowing packet (the ticket) down a rail through five layers, each layer
-// "scans" it, and a live trace console logs what that layer did.
-// Layer descriptions for the four suite layers mirror the live site; the
-// Enterprise Functions line, chips and trace entries are illustrative.
+// "AI Agents harnessed for resolution." Redesigned as a hub-and-spoke diagram
+// — the harness at the centre, its eight real components arranged around it.
+// Click or hover a node (no scroll-jacking) to see its tagline and sub-items;
+// the section demos itself once by auto-cycling, then hands control to the
+// reader. Content mirrors the live site's eight harness components verbatim.
 
-type Layer = {
+type Node = {
   name: string;
   tag: string;
   icon: LucideIcon;
-  accent: { text: string; ring: string; glow: string; chip: string; dot: string };
+  accent: { text: string; ring: string; glow: string; chip: string; line: string };
   chips: string[];
   description: string;
-  trace: { t: string; op: string; msg: string }[];
 };
 
-const LAYERS: Layer[] = [
+const NODES: Node[] = [
   {
-    name: "Enterprise Functions",
-    tag: "Where the work starts",
-    icon: Building2,
-    accent: {
-      text: "text-sky-300",
-      ring: "border-sky-300/50",
-      glow: "shadow-[0_0_50px_-12px_rgba(56,189,248,0.7)]",
-      chip: "bg-sky-400/10 text-sky-100 ring-sky-300/25",
-      dot: "bg-sky-300",
-    },
-    chips: ["IT", "Marketing", "Customer Support", "Sales", "HR"],
-    description:
-      "Requests arrive from every team's everyday tools: help desk, CRM, chat and email. The suite picks them up where they already live.",
-    trace: [
-      { t: "0.00s", op: "ticket.created", msg: "#48213 · Customer Support · via Zendesk" },
-      { t: "0.04s", op: "ticket.text", msg: "“SSO users are not syncing since this morning”" },
-    ],
+    name: "Every Channel",
+    tag: "One brain, consistent answers",
+    icon: Radio,
+    accent: { text: "text-sky-300", ring: "ring-sky-300/60", glow: "shadow-[0_0_40px_-10px_rgba(56,189,248,0.8)]", chip: "bg-sky-400/20 text-sky-50 ring-sky-300/40", line: "#38bdf8" },
+    chips: ["Portal", "Chat", "Email", "Voice", "In-product", "Agent desk"],
+    description: "Every channel reaches the same harness. Portal, chat, email, voice, in-product and the agent desk — one brain gives a consistent answer no matter where the question comes from.",
   },
   {
-    name: "AI Agents",
-    tag: "Agentic AI Suite",
+    name: "Purpose-built AI Agents",
+    tag: "Not one mega-bot",
     icon: Workflow,
-    accent: {
-      text: "text-cyan-300",
-      ring: "border-cyan-300/50",
-      glow: "shadow-[0_0_50px_-12px_rgba(34,211,238,0.7)]",
-      chip: "bg-cyan-400/10 text-cyan-100 ring-cyan-300/25",
-      dot: "bg-cyan-300",
-    },
-    chips: ["Support Agent", "Classification", "Knowledge", "Escalation", "+6"],
-    description:
-      "At the core of the SearchUnify Agentic AI suite is the capability to achieve end-to-end execution of tasks within enterprise business functions. Its purpose-built AI agents seamlessly exchange data, coordinate through distributed orchestration, and dynamically negotiate via MCP protocols: enabling complex, multi-step task execution both individually and collectively.",
-    trace: [
-      { t: "0.31s", op: "agent.claim", msg: "AI Support Agent picks up #48213" },
-      { t: "0.46s", op: "agent.handoff", msg: "AI Classification Agent → intent: sso_sync · P2" },
-    ],
+    accent: { text: "text-cyan-300", ring: "ring-cyan-300/60", glow: "shadow-[0_0_40px_-10px_rgba(34,211,238,0.8)]", chip: "bg-cyan-400/20 text-cyan-50 ring-cyan-300/40", line: "#22d3ee" },
+    chips: ["L1 Support", "L2 Troubleshooting", "Agent Partner", "Escalation", "Knowledge", "Case Quality"],
+    description: "Not one mega-bot. Six agent types, each scoped to a well-defined support job — L1 and L2 support, rep assist, escalation, knowledge, and case quality.",
   },
   {
-    name: "LLM Intelligence",
-    tag: "Reasoning with BYOLLM",
+    name: "Orchestration & Governance",
+    tag: "Plan, retrieve, act, verify",
+    icon: ShieldCheck,
+    accent: { text: "text-indigo-300", ring: "ring-indigo-300/60", glow: "shadow-[0_0_40px_-10px_rgba(129,140,248,0.8)]", chip: "bg-indigo-400/20 text-indigo-50 ring-indigo-300/40", line: "#818cf8" },
+    chips: ["Workflow builder", "Guardrails", "Human in the loop", "Evals", "Audit trail"],
+    description: "Every agent run is planned, retrieved, acted and verified — with guardrails, human-in-the-loop checkpoints, evals and a full audit trail behind every step.",
+  },
+  {
+    name: "Retrieval",
+    tag: "Agentic RAG, the right index for each question",
+    icon: Search,
+    accent: { text: "text-emerald-300", ring: "ring-emerald-300/60", glow: "shadow-[0_0_40px_-10px_rgba(52,211,153,0.8)]", chip: "bg-emerald-400/20 text-emerald-50 ring-emerald-300/40", line: "#34d399" },
+    chips: ["Lexical", "Dense", "Graph", "SQL", "Community", "Sufficiency check"],
+    description: "Not one search index for every question. Lexical, dense, graph and SQL retrieval, pulled from community too, with a sufficiency check before an agent ever acts on it.",
+  },
+  {
+    name: "Actions & Tools",
+    tag: "Answers become outcomes",
+    icon: Zap,
+    accent: { text: "text-amber-300", ring: "ring-amber-300/60", glow: "shadow-[0_0_40px_-10px_rgba(252,211,77,0.8)]", chip: "bg-amber-400/20 text-amber-50 ring-amber-300/40", line: "#fbbf24" },
+    chips: ["MCP tools", "Skills", "Agent-to-agent", "Ticketing", "Entitlements", "Billing"],
+    description: "A retrieved answer becomes an outcome: MCP tools, skills and agent-to-agent handoff reach into ticketing, entitlements and billing to actually close the loop.",
+  },
+  {
+    name: "Agent-ready Knowledge",
+    tag: "Written for machines, not just people",
+    icon: BookOpenCheck,
+    accent: { text: "text-blue-300", ring: "ring-blue-300/60", glow: "shadow-[0_0_40px_-10px_rgba(96,165,250,0.8)]", chip: "bg-blue-400/20 text-blue-50 ring-blue-300/40", line: "#60a5fa" },
+    chips: ["Cleanup / dedupe", "Knowledge from cases", "Freshness", "Versions & entitlements", "Gap detection"],
+    description: "Knowledge gets cleaned, deduplicated and kept fresh, with resolved cases turned into articles automatically and gaps flagged before a customer hits them.",
+  },
+  {
+    name: "Connected Data",
+    tag: "Permission-aware, no copy-and-hope",
+    icon: Database,
+    accent: { text: "text-teal-300", ring: "ring-teal-300/60", glow: "shadow-[0_0_40px_-10px_rgba(45,212,191,0.8)]", chip: "bg-teal-400/20 text-teal-50 ring-teal-300/40", line: "#2dd4bf" },
+    chips: ["Knowledge base", "Cases", "Community", "Product docs", "CRM", "Telemetry"],
+    description: "Connected, not copied: the harness reads knowledge, cases, community, docs, CRM and telemetry in place, with the same permissions your team already has.",
+  },
+  {
+    name: "Any Model",
+    tag: "Swappable, not where the results come from",
     icon: BrainCircuit,
-    accent: {
-      text: "text-violet-300",
-      ring: "border-violet-300/50",
-      glow: "shadow-[0_0_50px_-12px_rgba(167,139,250,0.7)]",
-      chip: "bg-violet-400/10 text-violet-100 ring-violet-300/25",
-      dot: "bg-violet-300",
-    },
-    chips: ["Planning", "Reasoning", "Tool use", "Your LLM"],
-    description:
-      "LLMs enrich the reasoning component of Agentic AI by enabling complex planning, natural language understanding, and contextual memory. Leveraging BYOLLM, the platform seamlessly uses any preferred model, facilitating tool utilization and continuous self-improvement, empowering AI Agents to generate coherent responses, adapt to new scenarios, and decide autonomously.",
-    trace: [
-      { t: "1.12s", op: "llm.plan", msg: "1 check tenant SSO config · 2 find fix · 3 draft reply" },
-      { t: "1.58s", op: "llm.route", msg: "reasoning → your preferred model (BYOLLM)" },
-    ],
-  },
-  {
-    name: "Memory Module",
-    tag: "SearchUnifyFRAG™ + Insights Engine",
-    icon: Layers,
-    accent: {
-      text: "text-blue-300",
-      ring: "border-blue-300/50",
-      glow: "shadow-[0_0_50px_-12px_rgba(96,165,250,0.7)]",
-      chip: "bg-blue-400/10 text-blue-100 ring-blue-300/25",
-      dot: "bg-blue-300",
-    },
-    chips: ["FRAG™ · short-term", "Insights Engine · long-term"],
-    description:
-      "The platform features a sophisticated memory module that facilitates complex task execution. It executes deep contextual understanding and temporal consistency. Leveraging proprietary SearchUnifyFRAG™ technology, it unifies siloed content to enhance short-term working memory, while the Insights Engine serves as long-term episodic and semantic memory, preserving critical data. This synergy enables the AI Agents to recall patterns, rules, and past interactions: facilitating informed, contextually relevant decisions that drive business success.",
-    trace: [
-      { t: "2.20s", op: "frag.retrieve", msg: "12 sources · docs, past cases, community" },
-      { t: "2.41s", op: "insights.recall", msg: "similar case #47102 resolved last week" },
-    ],
-  },
-  {
-    name: "SearchUnify MCP",
-    tag: "Model Context Protocols + connectors",
-    icon: Cable,
-    accent: {
-      text: "text-emerald-300",
-      ring: "border-emerald-300/50",
-      glow: "shadow-[0_0_50px_-12px_rgba(52,211,153,0.7)]",
-      chip: "bg-emerald-400/10 text-emerald-100 ring-emerald-300/25",
-      dot: "bg-emerald-300",
-    },
-    chips: ["Zendesk", "Salesforce", "Slack", "Jira", "SharePoint", "100+ tools"],
-    description:
-      "At the heart of the SearchUnify Agentic AI Suite are Model Context Protocols (MCPs). These pre-built protocols ensure contextual accuracy for AI models, enabling precise task execution across diverse business functions. Leveraging an expansive network of in-house connectors, MCPs drive accelerated time-to-value for AI initiatives and significantly enhance operational efficiency.",
-    trace: [
-      { t: "3.05s", op: "mcp.zendesk", msg: "update_ticket(#48213, status: solved, reply: …)" },
-      { t: "3.18s", op: "mcp.slack", msg: "notify(#support-ops, “SSO sync fixed”)" },
-    ],
+    accent: { text: "text-violet-300", ring: "ring-violet-300/60", glow: "shadow-[0_0_40px_-10px_rgba(167,139,250,0.8)]", chip: "bg-violet-400/20 text-violet-50 ring-violet-300/40", line: "#a78bfa" },
+    chips: ["GPT", "Claude", "Gemini", "Open-weight"],
+    description: "Every vendor runs the same models. SearchUnify is the harness around them — swap the model underneath without changing where the results come from.",
   },
 ];
 
-const N = LAYERS.length;
-const BAND_H = 96; // px — fixed so the rail can place the packet exactly
-const BAND_GAP = 14;
-const centerOf = (i: number) => i * (BAND_H + BAND_GAP) + BAND_H / 2;
+const N = NODES.length;
+const RADIUS = 37; // percent of the container
+const ease = [0.22, 1, 0.36, 1] as const;
 
-// Scroll → packet: it pauses on each layer (so there's time to read) and
-// travels between them. [from, to] progress for each hold.
-const HOLDS: [number, number][] = [
-  [0, 0.12],
-  [0.2, 0.32],
-  [0.4, 0.52],
-  [0.6, 0.72],
-  [0.8, 0.92],
-];
-const DONE_AT = 0.9;
-
-function activeFor(v: number) {
-  let a = 0;
-  HOLDS.forEach(([start], i) => {
-    if (v >= start - 0.04) a = i;
-  });
-  return a;
-}
-
-/* ---------- Layer band ---------- */
-
-function Band({
-  layer,
-  index,
-  state,
-  onSelect,
-}: {
-  layer: Layer;
-  index: number;
-  state: "done" | "active" | "next";
-  onSelect?: () => void;
-}) {
-  const Tag = onSelect ? "button" : "div";
-  return (
-    <Tag
-      type={onSelect ? "button" : undefined}
-      onClick={onSelect}
-      aria-current={state === "active" ? "step" : undefined}
-      style={{ height: BAND_H }}
-      className={cn(
-        "group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border px-5 text-left transition-[opacity,border-color,box-shadow,background-color] duration-500",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60",
-        state === "active" && cn(layer.accent.ring, layer.accent.glow, "bg-white/[0.06]"),
-        state === "done" && "border-white/10 bg-white/[0.03]",
-        state === "next" && "border-white/5 bg-white/[0.015] opacity-50",
-      )}
-    >
-      {/* Scanning sweep across the active layer */}
-      {state === "active" && (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent motion-reduce:hidden"
-          style={{ animation: "band-scan 2.2s ease-in-out infinite" }}
-        />
-      )}
-
-      <span
-        className={cn(
-          "grid size-10 shrink-0 place-items-center rounded-xl border transition-colors duration-500",
-          state === "active" ? cn(layer.accent.ring, layer.accent.text, "bg-white/5") : "border-white/10 text-slate-400",
-        )}
-      >
-        <layer.icon className="size-5" />
-      </span>
-
-      <span className="min-w-0 flex-1">
-        <span className="flex items-baseline gap-2">
-          <span className="text-[11px] font-semibold tabular-nums text-slate-500">0{index + 1}</span>
-          <span className="truncate text-[15px] font-semibold text-white">{layer.name}</span>
-        </span>
-        <span className="mt-2 flex flex-wrap gap-1.5">
-          {layer.chips.map((c) => (
-            <span
-              key={c}
-              className={cn(
-                "rounded-md px-2 py-0.5 text-[10.5px] font-medium ring-1 transition-colors duration-500",
-                state === "active" ? layer.accent.chip : "bg-white/[0.04] text-slate-400 ring-white/10",
-              )}
-            >
-              {c}
-            </span>
-          ))}
-        </span>
-      </span>
-
-      <span className="w-16 shrink-0 text-right font-mono text-[11px]">
-        {state === "done" && (
-          <span className="inline-flex items-center gap-1 text-emerald-300">
-            <Check className="size-3.5" strokeWidth={3} />
-            {layer.trace[layer.trace.length - 1].t}
-          </span>
-        )}
-        {state === "active" && <span className={layer.accent.text}>running</span>}
-      </span>
-    </Tag>
-  );
-}
-
-/* ---------- Trace console ---------- */
-
-function TraceConsole({ upTo, done }: { upTo: number; done: boolean }) {
-  const lines = LAYERS.slice(0, upTo + 1).flatMap((l, li) => l.trace.map((line) => ({ ...line, layer: li })));
-  return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur">
-      <div className="flex items-center justify-between border-b border-white/5 px-4 py-2.5">
-        <span className="font-mono text-[11px] text-slate-400">trace · ticket #48213</span>
-        <span className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-300">
-          <span className="size-1.5 animate-pulse rounded-full bg-emerald-400 motion-reduce:animate-none" />
-          live
-        </span>
-      </div>
-      <ol className="flex min-h-[248px] flex-col justify-end gap-1.5 px-4 py-3 font-mono text-[12px] leading-relaxed">
-        <AnimatePresence initial={false}>
-          {lines.map((l) => (
-            <motion.li
-              key={l.op + l.t}
-              layout
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="flex gap-3"
-            >
-              <span className="w-11 shrink-0 text-slate-600">{l.t}</span>
-              <span className={cn("shrink-0", LAYERS[l.layer].accent.text)}>{l.op}</span>
-              <span className={cn("min-w-0", l.layer === upTo ? "text-slate-200" : "text-slate-500")}>{l.msg}</span>
-            </motion.li>
-          ))}
-          {done && (
-            <motion.li
-              key="done"
-              layout
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-2 flex items-center gap-2 rounded-lg bg-emerald-400/10 px-3 py-2 font-sans text-[13px] font-semibold text-emerald-300 ring-1 ring-emerald-400/20"
-            >
-              <Check className="size-4" strokeWidth={3} />
-              Resolved in 3.2s · zero human touches
-            </motion.li>
-          )}
-        </AnimatePresence>
-      </ol>
-    </div>
-  );
-}
-
-/* ---------- Section ---------- */
-
-function Header() {
-  return (
-    <div className="mx-auto max-w-3xl px-6 text-center">
-      <span className="inline-block rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-300">
-        Architecture
-      </span>
-      <h2 id="arch-heading" className="mt-5 text-balance text-4xl font-bold tracking-tight text-white sm:text-5xl">
-        SearchUnify Agentic AI Suite Architecture
-      </h2>
-      <p className="mt-5 text-pretty text-lg text-slate-400">
-        Follow one support ticket through the stack, from the moment it arrives to the moment it’s solved.
-      </p>
-    </div>
-  );
-}
-
-function LayerText({ layer, index }: { layer: Layer; index: number }) {
-  return (
-    <>
-      <p className={cn("text-xs font-semibold uppercase tracking-[0.16em]", layer.accent.text)}>
-        Layer 0{index + 1} · {layer.tag}
-      </p>
-      <h3 className="mt-2 text-2xl font-bold tracking-tight text-white">{layer.name}</h3>
-      <p className="mt-3 text-sm leading-relaxed text-slate-400">{layer.description}</p>
-    </>
-  );
+function posFor(i: number) {
+  const angle = (i / N) * Math.PI * 2 - Math.PI / 2;
+  return { x: 50 + RADIUS * Math.cos(angle), y: 50 + RADIUS * Math.sin(angle) };
 }
 
 export function ArchStack() {
@@ -315,138 +112,295 @@ export function ArchStack() {
   const reduceMotion = useReducedMotion();
   return (
     <section aria-labelledby="arch-heading" className="relative pb-28 pt-12">
-      <Header />
-      {isDesktop && !reduceMotion ? <PinnedJourney /> : <StaticJourney />}
+      <div className="mx-auto max-w-3xl px-6 text-center">
+        <span className="inline-block rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-300">
+          The harness
+        </span>
+        <h2 id="arch-heading" className="mt-5 text-balance text-4xl font-bold tracking-tight text-white sm:text-5xl">
+          AI Agents harnessed for resolution.
+        </h2>
+        <p className="mt-5 text-pretty text-lg text-slate-400">
+          Every vendor runs the same models. SearchUnify is the harness around them: the knowledge, retrieval,
+          orchestration and governance that make agents resolve cases instead of deflecting them.
+        </p>
+      </div>
+
+      {isDesktop && !reduceMotion ? <Orbit /> : <StaticList />}
     </section>
   );
 }
 
-function PinnedJourney() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
-
-  const input = HOLDS.flat();
-  const output = HOLDS.flatMap((_, i) => [centerOf(i), centerOf(i)]);
-  const packetY = useTransform(progress, input, output);
-  const railFill = useTransform(packetY, (y) => `${y - centerOf(0)}px`);
-
+function Orbit() {
   const [active, setActive] = useState(0);
-  const [done, setDone] = useState(false);
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    setActive(activeFor(v));
-    setDone(v >= DONE_AT);
-  });
+  const [interacted, setInteracted] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: 0.4 });
 
-  const goTo = (i: number) => {
-    const el = ref.current;
-    if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    const travel = el.offsetHeight - window.innerHeight;
-    const [a, b] = HOLDS[i];
-    window.scrollTo({ top: top + travel * ((a + b) / 2), behavior: "smooth" });
+  useEffect(() => {
+    if (interacted || paused || !inView) return;
+    const t = setTimeout(() => setActive((a) => (a + 1) % N), 3200);
+    return () => clearTimeout(t);
+  }, [active, interacted, paused, inView]);
+
+  const pick = (i: number) => {
+    setActive(i);
+    setInteracted(true);
   };
 
-  const railH = centerOf(N - 1) - centerOf(0);
-  const layer = LAYERS[active];
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") pick((active + 1) % N);
+      else if (e.key === "ArrowLeft") pick((active - 1 + N) % N);
+    };
+    const el = ref.current;
+    el?.addEventListener("keydown", onKey);
+    return () => el?.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
+  const node = NODES[active];
 
   return (
-    <div ref={ref} className="relative mt-6 h-[380vh]">
-      <div className="sticky top-0 flex h-screen items-start px-6 pt-[132px]">
-        <div className="mx-auto grid w-full max-w-7xl items-start gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-          {/* Pipeline: rail + packet + bands */}
-          <div className="relative pl-10">
-            <div
-              aria-hidden="true"
-              className="absolute left-[15px] w-0.5 rounded-full bg-white/10"
-              style={{ top: centerOf(0), height: railH }}
-            >
-              <motion.div
-                style={{ height: railFill }}
-                className="w-full rounded-full bg-gradient-to-b from-sky-300 via-cyan-300 to-emerald-300"
-              />
-            </div>
-            {LAYERS.map((l, i) => (
-              <span
-                key={l.name}
-                aria-hidden="true"
-                className={cn(
-                  "absolute left-[11px] size-2.5 rounded-full ring-4 ring-[#050b1f] transition-colors duration-500",
-                  i <= active ? l.accent.dot : "bg-white/20",
-                )}
-                style={{ top: centerOf(i) - 5 }}
-              />
-            ))}
-            {/* The ticket */}
-            <motion.div
-              aria-hidden="true"
-              style={{ y: packetY }}
-              className="absolute left-[7px] top-0 -mt-[9px] size-[18px]"
-            >
-              <span className="absolute inset-0 animate-ping rounded-full bg-cyan-300/50" />
-              <span className="absolute inset-0 rounded-full bg-white shadow-[0_0_18px_4px_rgba(103,232,249,0.85)]" />
-            </motion.div>
-
-            <ol className="flex flex-col" style={{ gap: BAND_GAP }} aria-label="Architecture layers">
-              {LAYERS.map((l, i) => (
-                <li key={l.name}>
-                  <Band
-                    layer={l}
-                    index={i}
-                    state={i < active || (done && i === active && i === N - 1) ? "done" : i === active ? "active" : "next"}
-                    onSelect={() => goTo(i)}
+    <div
+      ref={ref}
+      tabIndex={-1}
+      className="relative mx-auto mt-16 max-w-7xl px-6 focus:outline-none"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,560px)_minmax(0,1fr)] lg:gap-16">
+        {/* The orbit */}
+        <div className="relative mx-auto aspect-square w-full max-w-[560px]">
+          <svg viewBox="0 0 100 100" className="absolute inset-0 size-full overflow-visible" aria-hidden="true">
+            <defs>
+              {NODES.map((n, i) => {
+                const p = posFor(i);
+                return (
+                  <linearGradient key={`g${i}`} id={`arch-g${i}`} x1={p.x} y1={p.y} x2="50" y2="50" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stopColor={n.accent.line} stopOpacity="0.1" />
+                    <stop offset="1" stopColor={n.accent.line} stopOpacity="0.85" />
+                  </linearGradient>
+                );
+              })}
+            </defs>
+            {NODES.map((n, i) => {
+              const p = posFor(i);
+              const isActive = i === active;
+              return (
+                <g key={n.name}>
+                  {/* Base line — always on, a soft gradient from each node into the hub. */}
+                  <line x1="50" y1="50" x2={p.x} y2={p.y} stroke={`url(#arch-g${i})`} strokeWidth={isActive ? 0.9 : 0.6} vectorEffect="non-scaling-stroke" style={{ transition: "stroke-width 0.4s" }} />
+                  {/* Ambient current — flows on every spoke by default, brighter/faster on the active one. */}
+                  <motion.line
+                    x1="50"
+                    y1="50"
+                    x2={p.x}
+                    y2={p.y}
+                    stroke={n.accent.line}
+                    strokeWidth={isActive ? 1.6 : 1}
+                    strokeLinecap="round"
+                    strokeDasharray={isActive ? "0.9 3" : "0.8 4"}
+                    strokeOpacity={isActive ? 1 : 0.55}
+                    vectorEffect="non-scaling-stroke"
+                    animate={{ strokeDashoffset: [0, -8] }}
+                    transition={{ duration: isActive ? 0.9 : 2.2, repeat: Infinity, ease: "linear", delay: i * 0.12 }}
                   />
-                </li>
-              ))}
-            </ol>
+                  {isActive && (
+                    <motion.line
+                      key={`draw-${active}`}
+                      x1="50"
+                      y1="50"
+                      x2={p.x}
+                      y2={p.y}
+                      stroke={n.accent.line}
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      vectorEffect="non-scaling-stroke"
+                      initial={{ pathLength: 0, opacity: 0.9 }}
+                      animate={{ pathLength: 1, opacity: 0 }}
+                      transition={{ duration: 0.6, ease }}
+                    />
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* Pulsing hub */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-full border border-cyan-300/40"
+              style={{ transformOrigin: "50% 50%" }}
+              animate={{ scale: [1, 1.8, 1], opacity: [0.4, 0, 0.4] }}
+              transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut" }}
+            />
+            <div className="relative grid size-24 place-items-center rounded-full bg-gradient-to-br from-[#0b1a3d] to-[#071028] text-center ring-1 ring-white/15 shadow-[0_0_50px_-10px_rgba(34,211,238,0.5)] sm:size-28">
+              <span className="text-base font-bold text-white sm:text-lg">Harness</span>
+            </div>
           </div>
 
-          {/* What this layer did */}
-          <div className="flex flex-col gap-5">
-            <div className="min-h-[200px]" aria-live="polite">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={layer.name}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          {/* Nodes */}
+          {NODES.map((n, i) => {
+            const p = posFor(i);
+            const isActive = i === active;
+            return (
+              <motion.button
+                key={n.name}
+                type="button"
+                onClick={() => pick(i)}
+                onMouseEnter={() => pick(i)}
+                aria-pressed={isActive}
+                aria-label={`${n.name} — ${n.tag}`}
+                initial={{ opacity: 0, scale: 0.6 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 + i * 0.06, ease }}
+                className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5 focus-visible:outline-none"
+                style={{ left: `${p.x}%`, top: `${p.y}%` }}
+              >
+                <motion.span
+                  animate={{ scale: isActive ? 1.1 : 1 }}
+                  transition={{ duration: 0.3, ease }}
+                  className={cn(
+                    "grid size-14 place-items-center rounded-2xl border border-white/10 bg-[#0b1226] transition-colors duration-300 sm:size-16",
+                    isActive ? n.accent.text : "text-slate-500 group-hover:text-slate-300",
+                  )}
                 >
-                  <LayerText layer={layer} index={active} />
-                </motion.div>
-              </AnimatePresence>
-            </div>
-            <TraceConsole upTo={active} done={done} />
-          </div>
+                  <n.icon className="size-6" />
+                </motion.span>
+                <span
+                  className={cn(
+                    "max-w-[96px] rounded-md bg-[#050b1f]/85 px-1.5 py-0.5 text-center text-[10.5px] leading-tight backdrop-blur-sm transition-[color,font-weight] duration-300 sm:max-w-[112px] sm:text-[11px]",
+                    isActive ? "font-bold text-white" : "font-medium text-slate-500",
+                  )}
+                >
+                  {n.name}
+                </span>
+              </motion.button>
+            );
+          })}
         </div>
+
+        {/* Detail panel */}
+        <div className="min-h-[280px]" aria-live="polite">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={node.name}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease }}
+            >
+              <div className="flex items-center gap-3">
+                <span className={cn("grid size-11 shrink-0 place-items-center rounded-xl bg-white/5 ring-1", node.accent.text, node.accent.ring)}>
+                  <node.icon className="size-5" />
+                </span>
+                <div>
+                  <p className={cn("text-xs font-semibold uppercase tracking-[0.14em]", node.accent.text)}>{node.tag}</p>
+                  <p className="font-mono text-[11px] text-slate-500">
+                    {active + 1} of {N}
+                  </p>
+                </div>
+              </div>
+              <h3 className="mt-4 text-3xl font-bold tracking-tight text-white">{node.name}</h3>
+              <p className="mt-4 text-[15px] leading-relaxed text-slate-400">{node.description}</p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {node.chips.map((c, i) => (
+                  <motion.span
+                    key={c}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.05 + i * 0.04, ease }}
+                    className={cn("rounded-full px-3 py-1 text-xs font-semibold ring-1", node.accent.chip)}
+                  >
+                    {c}
+                  </motion.span>
+                ))}
+              </div>
+              <div className="mt-7 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => pick((active - 1 + N) % N)}
+                  aria-label="Previous component"
+                  className="grid size-9 place-items-center rounded-full border border-white/10 text-slate-400 transition-colors hover:border-white/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={() => pick((active + 1) % N)}
+                  aria-label="Next component"
+                  className="grid size-9 place-items-center rounded-full border border-white/10 text-slate-400 transition-colors hover:border-white/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50"
+                >
+                  →
+                </button>
+                <span className="text-xs text-slate-500">or use ← → keys</span>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Progress dots */}
+      <div className="mt-10 flex justify-center gap-1.5" role="tablist" aria-label="Harness components">
+        {NODES.map((n, i) => (
+          <button
+            key={n.name}
+            type="button"
+            role="tab"
+            aria-selected={i === active}
+            aria-label={n.name}
+            onClick={() => pick(i)}
+            className={cn("h-1.5 rounded-full transition-all duration-300", i === active ? "w-6 bg-cyan-300" : "w-1.5 bg-white/15 hover:bg-white/30")}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
-// Mobile / reduced motion: every layer shown, each with its own trace lines.
-function StaticJourney() {
+// Mobile / reduced motion: a simple accordion, every component expandable.
+function StaticList() {
+  const [open, setOpen] = useState(0);
   return (
-    <ol className="mx-auto mt-12 flex max-w-2xl flex-col gap-4 px-4 sm:px-6">
-      {LAYERS.map((l, i) => (
-        <li key={l.name} className="rounded-3xl border border-white/10 bg-white/[0.03] p-4">
-          <Band layer={l} index={i} state="done" />
-          <div className="px-1 pt-4">
-            <LayerText layer={l} index={i} />
-            <ul className="mt-3 space-y-1 font-mono text-[11.5px]">
-              {l.trace.map((t) => (
-                <li key={t.op} className="flex gap-2">
-                  <span className={cn("shrink-0", l.accent.text)}>{t.op}</span>
-                  <span className="min-w-0 text-slate-400">{t.msg}</span>
-                </li>
-              ))}
-            </ul>
+    <div className="mx-auto mt-12 flex max-w-2xl flex-col gap-3 px-4 sm:px-6">
+      {NODES.map((n, i) => {
+        const expanded = open === i;
+        return (
+          <div key={n.name} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+            <button
+              type="button"
+              aria-expanded={expanded}
+              onClick={() => setOpen(expanded ? -1 : i)}
+              className="flex w-full items-center gap-3 p-4 text-left"
+            >
+              <span className={cn("grid size-10 shrink-0 place-items-center rounded-xl bg-white/5 ring-1", n.accent.text, n.accent.ring)}>
+                <n.icon className="size-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[15px] font-semibold text-white">{n.name}</span>
+                <span className={cn("block text-xs", n.accent.text)}>{n.tag}</span>
+              </span>
+            </button>
+            <div className={cn("grid transition-[grid-template-rows] duration-300", expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}>
+              <div className="overflow-hidden">
+                <div className="px-4 pb-4">
+                  <p className="text-sm leading-relaxed text-slate-400">{n.description}</p>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {n.chips.map((c) => (
+                      <span key={c} className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1", n.accent.chip)}>
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </li>
-      ))}
-      <li className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-400/10 px-4 py-3 text-sm font-semibold text-emerald-300 ring-1 ring-emerald-400/20">
-        <Check className="size-4" strokeWidth={3} /> Resolved in 3.2s · zero human touches
-      </li>
-    </ol>
+        );
+      })}
+    </div>
   );
 }

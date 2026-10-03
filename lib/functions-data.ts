@@ -1,7 +1,18 @@
-import { Headset, Megaphone, Server, TrendingUp, Users, type LucideIcon } from "lucide-react";
+import {
+  AlertTriangle,
+  BookOpenCheck,
+  Headset,
+  Route,
+  ShieldCheck,
+  UserCheck,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 
-// Business functions the agents serve. Shared by the hero deck and chapter 4a.
-// Descriptions mirror the live site; the agent runs are illustrative.
+// Agent runs shared across the hero deck, the dark "purpose-built agents"
+// chapter, and the transform CTA. Trigger/steps/result are illustrative;
+// names and framing mirror the live site's three hero examples and its
+// "Purpose-built AI Agents" harness component.
 export type Fn = {
   name: string;
   icon: LucideIcon;
@@ -11,52 +22,89 @@ export type Fn = {
   result: string;
 };
 
-export const FUNCTIONS: Fn[] = [
+// The hero's three live examples: front door, beside the rep, behind the queue.
+export const HERO_EXAMPLES: Fn[] = [
   {
-    name: "IT",
-    icon: Server,
-    description:
-      "AI-powered agents for proactive IT support and infrastructure monitoring—resolving incidents faster, enhancing security, and ensuring uptime.",
-    trigger: "Alert · API latency > 2s on prod-eu",
-    steps: ["Correlating logs with recent deploys", "Root cause: release 4.12.3", "Rolling back and verifying health"],
-    result: "Uptime restored in 3m 12s",
-  },
-  {
-    name: "Marketing",
-    icon: Megaphone,
-    description:
-      "Drive higher ROI with AI agents that power hyper-personalized campaigns and real-time performance optimization.",
-    trigger: "Campaign “Q4 launch” CTR down 18%",
-    steps: ["Segmenting audience by intent", "Generating 3 personalized variants", "Shifting budget to the best performer"],
-    result: "A/B test live · CTR +11%",
-  },
-  {
-    name: "Customer Support",
+    name: "L1 Support AI Agent",
     icon: Headset,
     description:
-      "Deliver exceptional support with scalable Agentic AI-faster resolutions, higher CSAT, and lower operational costs from first contact to close.",
-    trigger: "New case #48213 · “SSO users not syncing”",
-    steps: ["Retrieving 12 sources via SearchUnifyFRAG™", "Drafting a grounded answer", "Guardrails passed · confidence 94%"],
-    result: "Resolved · zero human touches",
+      "Answers at the front door — retrieves from the knowledge base before it ever replies, and hands off the moment it can't find a source.",
+    trigger: "Help center · session 8f2a · “SSO login keeps failing on SAML”",
+    steps: ["Retrieving SAML setup docs and past cases", "Drafting a grounded answer with citations", "Confidence check passed · no human needed"],
+    result: "Deflected · zero human touches",
   },
   {
-    name: "Sales",
-    icon: TrendingUp,
+    name: "AI Agent Partner",
+    icon: UserCheck,
     description:
-      "Accelerate your sales funnel with AI-driven lead qualification, deal acceleration and actionable insights for smarter selling.",
-    trigger: "Inbound lead · VP Support, 5k seats",
-    steps: ["Enriching account and intent signals", "Lead score 92 · strong fit", "Routing to the right account executive"],
-    result: "Meeting booked for Tuesday",
+      "Works beside the rep — drafts the reply, pulls the right sources, and leaves the call to resolve with the human.",
+    trigger: "Case #48213 · assigned to Priya R.",
+    steps: ["Reading the data-export job logs", "Drafting a reply grounded in the runbook", "Flagging for Priya's approval"],
+    result: "Draft ready · Priya sends in one click",
   },
   {
-    name: "Human Resource",
-    icon: Users,
+    name: "Intelligent Routing Agent",
+    icon: Route,
     description:
-      "Transform HR with intelligent agents that optimize talent acquisition, boost retention, and enable data-driven workforce management.",
-    trigger: "Employee · “How do I add a dependent?”",
-    steps: ["Checking the 2026 benefits policy", "Pre-filling the enrollment form", "Sending answer with next steps"],
-    result: "Answered · ticket avoided",
+      "Works behind the queue — routes the case, scores the resolution, and feeds what it learns back to the front door.",
+    trigger: "Case #48390 · one case, three agents behind the queue",
+    steps: ["Classifying intent and urgency", "Routing to the right queue and rep", "QA scoring the closed case"],
+    result: "Routed, resolved, and scored — loop closed",
   },
 ];
 
-export const SUPPORT_INDEX = 2; // Customer Support — support-first positioning.
+export const HERO_DEFAULT_INDEX = 0;
+
+// The six purpose-built agent types from "AI Agents harnessed for resolution."
+export const AGENT_TYPES: Fn[] = [
+  {
+    name: "L1 Support",
+    icon: Headset,
+    description: "Answers the front door first, retrieving before it ever replies.",
+    trigger: "New case · “Can't access the admin console”",
+    steps: ["Retrieving 9 sources via agentic RAG", "Drafting a grounded answer", "Guardrails passed · citing 3 sources"],
+    result: "Resolved · zero human touches",
+  },
+  {
+    name: "L2 Troubleshooting",
+    icon: Wrench,
+    description: "Digs into the harder technical cases a front-door agent hands off.",
+    trigger: "Escalated · “Data export job stuck at 80%”",
+    steps: ["Correlating job logs with recent releases", "Root cause: queue worker timeout", "Applying the documented fix"],
+    result: "Resolved · root cause logged",
+  },
+  {
+    name: "Agent Partner",
+    icon: UserCheck,
+    description: "Drafts beside the rep and leaves the send decision to them.",
+    trigger: "Case #48213 · assigned to Priya R.",
+    steps: ["Reading the case thread and prior notes", "Drafting a grounded reply", "Flagged for one-click approval"],
+    result: "Draft ready for review",
+  },
+  {
+    name: "Escalation",
+    icon: AlertTriangle,
+    description: "Flags at-risk cases before they blow up, with the evidence attached.",
+    trigger: "Case #49102 · sentiment trending negative",
+    steps: ["Scoring sentiment and SLA risk", "Checking account tier and history", "Notifying the escalation queue"],
+    result: "Escalated · manager notified",
+  },
+  {
+    name: "Knowledge",
+    icon: BookOpenCheck,
+    description: "Turns every resolved case into an article, so the next one has a source.",
+    trigger: "Case #48213 · resolved, no matching article",
+    steps: ["Drafting an article from the resolution", "Checking for duplicate knowledge", "Publishing for review"],
+    result: "Published · KCS flow complete",
+  },
+  {
+    name: "Case Quality",
+    icon: ShieldCheck,
+    description: "Scores every closed case against policy, not a sample.",
+    trigger: "Case #48390 · closed 4m ago",
+    steps: ["Checking tone, accuracy and sources cited", "Scoring against the QA rubric", "Logging the score to the trace"],
+    result: "100% QA · score 96/100",
+  },
+];
+
+export const AGENT_DEFAULT_INDEX = 0;

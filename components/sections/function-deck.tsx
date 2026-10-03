@@ -1,7 +1,7 @@
 "use client";
 
 import { AgentLog } from "@/components/sections/agent-log";
-import { FUNCTIONS, SUPPORT_INDEX, type Fn } from "@/lib/functions-data";
+import { HERO_EXAMPLES, HERO_DEFAULT_INDEX, type Fn } from "@/lib/functions-data";
 import { cn } from "@/lib/utils";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
@@ -18,7 +18,7 @@ export function FunctionDeck({ className }: { className?: string }) {
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
-  const [order, setOrder] = useState(() => FUNCTIONS.map((_, i) => (i + SUPPORT_INDEX) % FUNCTIONS.length));
+  const [order, setOrder] = useState(() => HERO_EXAMPLES.map((_, i) => (i + HERO_DEFAULT_INDEX) % HERO_EXAMPLES.length));
   const [leaving, setLeaving] = useState<number | null>(null);
   const [paused, setPaused] = useState(false);
 
@@ -45,13 +45,13 @@ export function FunctionDeck({ className }: { className?: string }) {
       ref={ref}
       role="region"
       aria-roledescription="carousel"
-      aria-label="AI agents by team"
+      aria-label="Live SearchUnify agent examples"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       // Card height plus room for the cards peeking out above it.
       className={cn("relative h-[480px] w-full", className)}
     >
-      {FUNCTIONS.map((fn, i) => {
+      {HERO_EXAMPLES.map((fn, i) => {
         const depth = order.indexOf(i);
         const isTop = depth === 0;
         const tucking = leaving === i;
@@ -130,7 +130,7 @@ function DeckCard({
           <fn.icon className="size-5" />
         </span>
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">AI agents for</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Live example</p>
           <h3 className="truncate text-xl font-semibold text-slate-950">{fn.name}</h3>
         </div>
         <span className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700 ring-1 ring-emerald-500/20">

@@ -3,8 +3,7 @@
 import {
   DeployVisual,
   EthicsVisual,
-  ModelsVisual,
-  ResilienceVisual,
+  LoopVisual,
   UnifiedDataVisual,
 } from "@/components/sections/pillar-visuals";
 import { cn } from "@/lib/utils";
@@ -14,44 +13,36 @@ import Link from "next/link";
 import { useIsDesktop } from "@/lib/use-is-desktop";
 import { Fragment, useRef, useState, type KeyboardEvent } from "react";
 
-// Chapter 3 — "Embed Agentic AI Across Your Enterprise".
-// Titles and descriptions mirror the live site; `term` explains the jargon in
-// plain words (PRD: explain FRAG/BYOLLM where first used).
+// "Connect. Deploy. Resolve." — the four-step "How It Works" narrative.
+// Titles, descriptions and tags mirror the live site.
 const PILLARS = [
   {
-    title: "Leverage Unified Data",
-    description: "With SearchUnifyFRAG™ make your data the foundation of success.",
-    term: "SearchUnifyFRAG™ = federated RAG across every knowledge source",
-    visualLabel: "Six content sources flowing into SearchUnifyFRAG, which returns an answer grounded in all six.",
+    title: "Connect",
+    description: "Point it at what you already run — CRM, ticketing, KB, docs, community, telemetry, LMS.",
+    term: "40+ connectors, MCP, permission-aware",
+    visualLabel: "Six connected systems flowing into a unified index that returns a grounded answer.",
     Visual: UnifiedDataVisual,
   },
   {
-    title: "Select Optimal Models",
-    description: "Choose the best mix of LLMs (BYOLLM) to get results tailored to your goals.",
-    term: "BYOLLM = bring your own LLM, routed per task",
-    visualLabel: "A model routing table sending each support task to a different LLM, with an option to add your own.",
-    Visual: ModelsVisual,
+    title: "Deploy the agents",
+    description: "Purpose-built for defined support jobs. Switch on the ones you need, scoped to the topics you choose. Live on day one.",
+    term: "L1 Support, Agent Partner, Routing · QA · Knowledge",
+    visualLabel: "An agent library with L1 Support and Agent Partner live, and more agents ready to deploy.",
+    Visual: DeployVisual,
   },
   {
-    title: "Forge Operational Resilience",
-    description: "Secure every stage of the AI lifecycle with a robust, multilayered framework.",
-    term: "Security layers from data to runtime",
-    visualLabel: "Stacked security layers: encryption, SSO and role-based access, PII redaction and audit trail, with ISO 27001, SOC 2 and HIPAA badges.",
-    Visual: ResilienceVisual,
-  },
-  {
-    title: "Ensure Ethical Autonomy",
-    description: "Foster user confidence with built-in governance and guardrails that steer AI ethically.",
-    term: "Guardrails check every answer before it's sent",
-    visualLabel: "An agent's draft answer passing three guardrail checks with 94% confidence; low-confidence answers go to a human.",
+    title: "They resolve, with a source",
+    description: "Retrieve first, then act — answer, draft, route, create the Jira, publish the KB. Every action cited, logged, and hand-off ready.",
+    term: "RAG grounding, acts via MCP, no source no action",
+    visualLabel: "An agent's draft answer passing guardrail checks with 94% confidence; low-confidence answers go to a human.",
     Visual: EthicsVisual,
   },
   {
-    title: "Deploy with Confidence",
-    description: "Accelerate outcomes with pre-built AI agents: tailored for enterprise needs.",
-    term: "8 pre-built agents, ready to switch on",
-    visualLabel: "An agent library with AI Support Agent and AI Knowledge Agent live, and more agents ready to deploy.",
-    Visual: DeployVisual,
+    title: "The crew gets smarter",
+    description: "QA scores every case, Knowledge writes the article, Routing learns the pattern — so the front door has a source next time.",
+    term: "100% QA, KCS articles, loop closed",
+    visualLabel: "QA scoring a closed case, Knowledge publishing an article from it, and Routing learning the pattern.",
+    Visual: LoopVisual,
   },
 ];
 
@@ -100,13 +91,14 @@ export function PlatformPillars() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-block rounded-full bg-[#005be2]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#005be2]">
-            The platform
+            How it works
           </span>
           <h2 id="pillars-heading" className="mt-5 text-balance text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">
-            Embed Agentic AI Across Your Enterprise
+            Connect. Deploy. Resolve.
           </h2>
           <p className="mt-5 text-pretty text-lg text-slate-600">
-            Five building blocks that take you from scattered knowledge to trusted AI agents in production.
+            No model training. No agent building. No knowledge migration. Your systems stay where they are; the
+            harness runs on top.
           </p>
         </div>
 

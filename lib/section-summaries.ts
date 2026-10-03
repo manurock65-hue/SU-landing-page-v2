@@ -1,6 +1,6 @@
 // Summaries for the "Summarize this section" assistant, keyed by each
-// section's heading id. Written from the section's own content (there is no
-// live model behind the assistant); keep them in sync when copy changes.
+// section's heading id (there is no live model behind the assistant); keep
+// these in sync when section copy changes.
 export type SectionSummary = {
   id: string; // heading element id
   title: string;
@@ -16,95 +16,80 @@ export const SECTION_SUMMARIES: SectionSummary[] = [
     points: ["Customers include Netskope, Fortinet, Flexera, Reltio, Rubrik, Cornerstone and nCino", "20+ enterprise brands rely on it for customer support"],
   },
   {
-    id: "pillars-heading",
-    title: "Embed Agentic AI Across Your Enterprise",
-    summary: "Five building blocks take you from scattered knowledge to trusted AI agents in production.",
-    points: [
-      "Unified data with SearchUnifyFRAG™ and your choice of LLMs (BYOLLM)",
-      "Multilayered security plus guardrails that check every answer",
-      "Pre-built agents so you can deploy with confidence",
-    ],
-  },
-  {
-    id: "functions-heading",
-    title: "AI Agents Engineered for Your Business Functions",
-    summary: "The same agentic platform serves IT, Marketing, Customer Support, Sales and HR, each with agents that pick up a task and close it out.",
-    points: [
-      "IT: correlate logs, find the root cause, roll back",
-      "Support: retrieve sources, draft a grounded answer, pass guardrails",
-      "Sales, Marketing and HR: qualify leads, optimize campaigns, answer policy questions",
-    ],
-  },
-  {
-    id: "suite-heading",
-    title: "AI Agents for Customer Support",
-    summary: "Ten prebuilt AI agents cover the whole support journey, all connected via MCP and powered by SearchUnifyFRAG™.",
-    points: [
-      "Self-service: AI Support Agent and Proactive Support Agent",
-      "Agent assist: Agent Partner, Competency Agent, Workflow Automation",
-      "Knowledge and quality: Knowledge Agent, Feedback Analyst, Classification, Escalation Manager, Case Quality Auditor",
-    ],
-  },
-  {
-    id: "arch-heading",
-    title: "SearchUnify Agentic AI Suite Architecture",
-    summary: "A ticket flows through five layers, from the team that raised it to the tools that resolve it.",
-    points: [
-      "Enterprise functions → AI agents that coordinate the work",
-      "LLM intelligence (BYOLLM) plans and reasons; FRAG™ and the Insights Engine act as memory",
-      "SearchUnify MCP connects to Zendesk, Salesforce, Slack and 100+ tools to act",
-    ],
-  },
-  {
-    id: "outcomes-heading",
-    title: "Transform Customer Support Outcomes",
-    summary: "Six outcomes SearchUnify drives to raise CSAT, from better self-service to measurable ROI.",
-    points: [
-      "Better self-service, empathetic AI support and smarter ticket routing",
-      "Consistent service at scale and knowledge-centered support (KCS)",
-      "Save ~$1 million in support cost within three months of deployment",
-    ],
-  },
-  {
     id: "stories-heading",
-    title: "Real-World Customer Success Stories",
-    summary: "Customers report measurable gains in resolution speed, self-service and knowledge creation.",
+    title: "Real conversations. Real outcomes.",
+    summary: "SearchUnify Customer Pulse — video conversations with customers on what changed after deploying the harness.",
     points: [
-      "Accela: 92.7% faster first response, 77.5% more cases closed",
-      "Cornerstone OnDemand: 98% self-service resolution rate",
-      "Automation Anywhere: 57% boost in knowledge creation; EBSCO: 125.8% growth in academy views",
+      "GlobalFoundries: seamless self-service, one place for engineers to find the answer",
+      "TechnologyOne: 76% case deflection with SearchUnify AI-powered support",
+      "Revenera and Celonis report faster resolution and unified knowledge visibility",
     ],
   },
   {
     id: "recognitions-heading",
-    title: "Industry Recognitions",
+    title: "Industry recognition",
     summary: "Leading analysts consistently recognize SearchUnify for enterprise search and knowledge management.",
     points: [
-      "G2 Leader for 25 consecutive quarters",
-      "Forrester Strong Performer, IDC Major Player, Everest Group Major Contender",
-      "SoftwareReviews Champion and Gold Medalist",
+      "G2 Leader for 26 consecutive quarters",
+      "KMWorld AI 100 · 2026, Everest Group PEAK Matrix Major Contender",
+      "SoftwareReviews Champion, Globee Gold, IDC MarketScape Major Player",
+    ],
+  },
+  {
+    id: "gap-heading",
+    title: "Most AI support pilots stall for four reasons.",
+    summary: "What got sold was a builder instead of an agent, a bot instead of a crew, an answer instead of a resolution, and a guess instead of a source.",
+    points: [
+      "Purpose-built agents for defined jobs, live on day one — not a builder project",
+      "A harness where agents share context and hand off work, not a standalone bot",
+      "No source, no action: every answer is retrieved, cited and logged, or it hands off",
+    ],
+  },
+  {
+    id: "pillars-heading",
+    title: "Connect. Deploy. Resolve.",
+    summary: "No model training, no agent building, no knowledge migration — the harness runs on top of what you already use.",
+    points: [
+      "Connect to CRM, ticketing, KB, docs, community and telemetry",
+      "Deploy the purpose-built agents you need, scoped to your topics",
+      "Agents resolve with a cited source, and the crew gets smarter every case",
+    ],
+  },
+  {
+    id: "arch-heading",
+    title: "AI Agents harnessed for resolution.",
+    summary: "The harness around the model: channels, agents, orchestration, retrieval, actions, knowledge, data and models working together.",
+    points: [
+      "Every channel reaches the same harness for a consistent answer",
+      "Purpose-built agents are orchestrated with guardrails and a full audit trail",
+      "Agentic RAG retrieves from connected, permission-aware data, then acts via MCP",
+    ],
+  },
+  {
+    id: "outcomes-heading",
+    title: "Customer outcomes",
+    summary: "What changes when the harness is on, measured across deflection, escalations, resolution time, CSAT and renewals.",
+    points: [
+      "60% increase in case deflection, 45% reduction in escalations",
+      "35% faster resolution, 40% higher CSAT",
+      "20% higher renewals",
+    ],
+  },
+  {
+    id: "governance-heading",
+    title: "Autonomy you can audit.",
+    summary: "Every agent action is scoped, logged, and reversible, with a full trace and certified compliance.",
+    points: [
+      "Permission-aware retrieval and source citation on every answer",
+      "Topic-level guardrails with confidence thresholds for handoff",
+      "Full audit trail, meets SOC 2 Type II, ISO 27001:2013, HIPAA and GDPR",
     ],
   },
   {
     id: "transform-heading",
-    title: "Begin Your AI Transformation",
-    summary: "Two ways to get started: see the agents work in a demo, or talk to an expert about your use case.",
-    points: ["Book a Demo to watch AI agents streamline real workflows", "Talk to an Expert for tailored use cases and technical depth"],
-  },
-  {
-    id: "resources-heading",
-    title: "Featured Resources",
-    summary: "Playbooks, research and walkthroughs to go deeper on agentic AI for support.",
-    points: [
-      "Blogs, webinars, analyst reports, datasheets, e-books and videos",
-      "Start with The AI Agent Adoption Playbook and Top 5 AI Agent Use Cases",
-    ],
-  },
-  {
-    id: "partners-heading",
-    title: "Our Partners",
-    summary: "Technology, platform and industry partners bring SearchUnify into the tools support teams already use.",
-    points: ["Salesforce, Microsoft, ServiceNow and Khoros", "Plus TSIA, Adobe Experience Manager, Higher Logic, Heretto and more"],
+    title: "Bring your hardest ticket.",
+    summary: "Not a canned demo — bring a real case and watch the agent retrieve, cite, and answer it live, or talk it through with an expert.",
+    points: ["Book a Demo to see the agents work on a real case", "Talk to an Expert for tailored use cases and technical depth"],
   },
   {
     id: "faq-heading",
