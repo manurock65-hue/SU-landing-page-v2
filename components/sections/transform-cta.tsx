@@ -16,7 +16,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 export function TransformCta() {
   return (
-    <section aria-labelledby="transform-heading" className="relative isolate overflow-hidden bg-[#050b1f] px-6 pb-28 pt-8 sm:pb-36">
+    <section aria-labelledby="transform-heading" className="relative isolate overflow-hidden bg-[#050b1f] px-6 py-28 sm:py-36">
       <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-1/4 -z-10 h-80 w-[48rem] rounded-full bg-[#ff7400] opacity-[0.12] blur-[140px]" />
       <div aria-hidden="true" className="pointer-events-none absolute right-0 top-1/3 -z-10 h-80 w-[36rem] rounded-full bg-cyan-400 opacity-[0.08] blur-[140px]" />
 

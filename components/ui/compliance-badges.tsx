@@ -57,7 +57,7 @@ export function ComplianceBadges({
         </div>
         <ul
           aria-label="Security and compliance"
-          className="grid w-full grid-cols-2 place-items-center gap-x-4 gap-y-6 sm:flex sm:flex-1 sm:items-center sm:justify-evenly sm:divide-x sm:divide-slate-200 sm:gap-0 sm:py-6"
+          className="grid w-full grid-cols-2 place-items-center gap-x-4 gap-y-6 sm:flex sm:flex-1 sm:items-stretch sm:divide-x sm:divide-slate-200 sm:gap-0 sm:py-6"
         >
           {COMPLIANCE.map((c, i) => (
             <motion.li
@@ -66,7 +66,7 @@ export function ComplianceBadges({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.6 }}
               transition={{ duration: 0.4, delay: i * 0.08 }}
-              className="flex flex-col items-center justify-center gap-2 px-4 text-center transition-transform duration-200 hover:-translate-y-0.5 first:pl-0 last:pr-0"
+              className="flex flex-col items-center justify-center gap-2 px-4 text-center transition-transform duration-200 hover:-translate-y-0.5 sm:flex-1 sm:basis-0"
             >
               <Seal mark={c.mark} className="size-12" />
               <span className="text-[11px] font-medium text-slate-500">{c.name}</span>

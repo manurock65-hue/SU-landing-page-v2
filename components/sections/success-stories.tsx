@@ -118,7 +118,7 @@ function ClientSwitchStrip({ activeId, onSelect }: { activeId: string; onSelect:
             aria-pressed={on}
             aria-label={`Play ${s.company} customer story`}
             className={cn(
-              "relative flex h-32 flex-col items-center justify-center px-4 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#005be2]/50",
+              "relative flex h-40 flex-col items-center justify-center px-4 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#005be2]/50",
               on ? "bg-[#005be2]/[0.05]" : "hover:bg-slate-50",
               i % 2 === 1 && "border-l border-dashed border-slate-200",
               i >= 2 && "border-t border-dashed border-slate-200 sm:border-t-0",
@@ -134,10 +134,10 @@ function ClientSwitchStrip({ activeId, onSelect }: { activeId: string; onSelect:
             <Image
               src={s.logo}
               alt={s.company}
-              width={106}
-              height={106}
+              width={127}
+              height={127}
               className={cn(
-                "size-[88px] rounded-lg object-contain transition-[opacity,transform] duration-300 sm:size-[106px]",
+                "size-[106px] rounded-lg object-contain transition-[opacity,transform] duration-300 sm:size-[127px]",
                 on ? "scale-110 opacity-100" : "opacity-70 hover:opacity-100",
               )}
             />

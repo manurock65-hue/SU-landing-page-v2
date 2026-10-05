@@ -1,12 +1,13 @@
 "use client";
 
+import { AgentNetworkBackground } from "@/components/ui/agent-network-background";
 import { ComplianceBadges } from "@/components/ui/compliance-badges";
 import { CONTACT_HREF, DEMO_HREF, SITE } from "@/lib/nav-data";
 import { cn } from "@/lib/utils";
 import { ArrowUp, ArrowUpRight, Mail, MapPin, Phone, ShieldCheck, Sparkles, type LucideIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import type { MouseEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 // Site footer. Columns, contact details and legal links mirror the live site.
 // Adds an "Ask AI" row (one-click summaries of SearchUnify in popular AI
@@ -117,6 +118,7 @@ const linkClass =
 export function SiteFooter() {
   return (
     <footer className="relative overflow-hidden border-t border-slate-200 bg-white">
+      <AgentNetworkBackground />
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#ff7400]/60 to-transparent" />
       <div aria-hidden="true" className="pointer-events-none absolute -bottom-40 left-1/2 h-80 w-[60rem] -translate-x-1/2 rounded-full bg-[#ff7400] opacity-[0.08] blur-[120px]" />
 
@@ -124,7 +126,7 @@ export function SiteFooter() {
         <div className="grid gap-14 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
           <div>
             <Link href="/" aria-label="SearchUnify home" className="inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#005be2]/50">
-              <Image src="/assets/searchunify-logo.webp" alt="SearchUnify" width={227} height={40} className="h-8 w-auto" />
+              <Image src="/assets/searchunify-logo.svg" alt="SearchUnify" width={227} height={40} className="h-8 w-auto" />
             </Link>
             <p className="mt-5 max-w-sm text-pretty text-[15px] leading-relaxed text-slate-600">
               Agentic AI for enterprise customer support—optimized, autonomous, trusted and proven to deliver results.
@@ -218,36 +220,14 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <Wordmark />
+      <div aria-hidden="true" className="footer-color-stripe mt-2 h-[3px] w-full motion-reduce:animate-none" />
     </footer>
-  );
-}
-
-/* Oversized wordmark. Quiet by default; on hover an AI-style gradient flows
-   through the letters around the cursor, with a sparkle riding the pointer. */
-function Wordmark() {
-  const onMove = (e: MouseEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty("--x", `${e.clientX - r.left}px`);
-    e.currentTarget.style.setProperty("--y", `${e.clientY - r.top}px`);
-  };
-
-  return (
-    <div aria-hidden="true" onMouseMove={onMove} className="group relative mx-auto -mb-[3vw] mt-4 max-w-7xl select-none px-4">
-      <p className="bg-gradient-to-b from-slate-200 to-white bg-clip-text text-center text-[17vw] font-bold leading-none tracking-tighter text-transparent xl:text-[13.5rem]">
-        SearchUnify
-      </p>
-      <p className="ai-flow-text absolute inset-0 px-4 text-center text-[17vw] font-bold leading-none tracking-tighter opacity-0 transition-opacity duration-500 [mask-image:radial-gradient(340px_circle_at_var(--x)_var(--y),black,transparent_70%)] group-hover:opacity-100 motion-reduce:[animation:none] xl:text-[13.5rem]">
-        SearchUnify
-      </p>
-      <Sparkles className="pointer-events-none absolute left-[var(--x)] top-[var(--y)] size-6 -translate-x-1/2 -translate-y-1/2 text-[#ff7400] opacity-0 transition-opacity duration-300 group-hover:animate-pulse group-hover:opacity-100" />
-    </div>
   );
 }
 
 function AskAi() {
   return (
-    <div className="mt-8 max-w-sm rounded-2xl border border-slate-200 bg-slate-50 p-4">
+    <div className="ask-ai-bg mt-8 max-w-sm rounded-2xl border border-slate-200 p-4 motion-reduce:animate-none">
       <p className="flex items-center gap-2 text-sm font-medium text-slate-700">
         <Sparkles className="size-4 text-[#ff7400]" />
         Ask AI for a summary about SearchUnify

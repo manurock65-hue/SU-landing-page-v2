@@ -191,21 +191,37 @@ function Orbit() {
                 <g key={n.name}>
                   {/* Base line — always on, a soft gradient from each node into the hub. */}
                   <line x1="50" y1="50" x2={p.x} y2={p.y} stroke={`url(#arch-g${i})`} strokeWidth={isActive ? 0.9 : 0.6} vectorEffect="non-scaling-stroke" style={{ transition: "stroke-width 0.4s" }} />
-                  {/* Ambient current — flows on every spoke by default, brighter/faster on the active one. */}
-                  <motion.line
-                    x1="50"
-                    y1="50"
-                    x2={p.x}
-                    y2={p.y}
-                    stroke={n.accent.line}
-                    strokeWidth={isActive ? 1.6 : 1}
-                    strokeLinecap="round"
-                    strokeDasharray={isActive ? "0.9 3" : "0.8 4"}
-                    strokeOpacity={isActive ? 1 : 0.55}
-                    vectorEffect="non-scaling-stroke"
-                    animate={{ strokeDashoffset: [0, -8] }}
-                    transition={{ duration: isActive ? 0.9 : 2.2, repeat: Infinity, ease: "linear", delay: i * 0.12 }}
-                  />
+                  {/* Ambient current — only the active spoke animates continuously; the
+                      rest sit as a static dashed line so seven infinite loops aren't
+                      running at once (that was the lag). */}
+                  {isActive ? (
+                    <motion.line
+                      x1="50"
+                      y1="50"
+                      x2={p.x}
+                      y2={p.y}
+                      stroke={n.accent.line}
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeDasharray="0.9 3"
+                      vectorEffect="non-scaling-stroke"
+                      animate={{ strokeDashoffset: [0, -8] }}
+                      transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
+                    />
+                  ) : (
+                    <line
+                      x1="50"
+                      y1="50"
+                      x2={p.x}
+                      y2={p.y}
+                      stroke={n.accent.line}
+                      strokeWidth="1"
+                      strokeLinecap="round"
+                      strokeDasharray="0.8 4"
+                      strokeOpacity="0.55"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  )}
                   {isActive && (
                     <motion.line
                       key={`draw-${active}`}

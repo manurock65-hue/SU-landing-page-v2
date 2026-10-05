@@ -46,8 +46,22 @@ const HOLD_MS = 2400;
 
 export function Governance() {
   return (
-    <section aria-labelledby="governance-heading" className="bg-white px-6 py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl">
+    <section aria-labelledby="governance-heading" className="relative overflow-hidden bg-white px-6 py-24 sm:py-32">
+      {/* A fine audit-ledger grid, continuously swept by a security-scan beam —
+          "autonomy you can audit" as a literal, always-running scan. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 [background-image:linear-gradient(rgba(15,23,42,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.05)_1px,transparent_1px)] [background-size:36px_36px] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_35%,black,transparent)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 -z-10 h-56 animate-governance-scan bg-gradient-to-b from-transparent via-[#005be2]/[0.09] to-transparent [mask-image:radial-gradient(ellipse_75%_65%_at_50%_35%,black,transparent)] motion-reduce:hidden"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 -z-10 h-px animate-governance-scan bg-gradient-to-r from-transparent via-cyan-300 to-transparent shadow-[0_0_12px_2px_rgba(34,211,238,0.6)] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_35%,black,transparent)] motion-reduce:hidden"
+      />
+      <div className="relative mx-auto max-w-6xl">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
         <div>
           <span className="inline-block rounded-full bg-[#005be2]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#005be2]">

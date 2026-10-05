@@ -1,0 +1,433 @@
+/* "AI Agents harnessed for resolution." — pinned, scroll-driven layer stack.
+   Layout and motion follow griffin.com's bank-platform section; colours are
+   the SearchUnify dark navy chapter. */
+
+.root {
+  --hs-pad: 24px;
+  --hs-line-size: 1px;
+  --hs-line-color: rgba(148, 163, 184, 0.16);
+  --hs-surface: #050b1f;
+  --hs-marker-size: 7px;
+  padding-bottom: 3.5rem;
+}
+
+@media (min-width: 48em) {
+  .root {
+    --hs-pad: 52px;
+  }
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.layout {
+  display: grid;
+  grid-template-areas: "content" "visual";
+  grid-template-rows: minmax(0, 300px) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+}
+
+@media (min-width: 48em) {
+  .layout {
+    grid-template-areas: "content visual";
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.content {
+  grid-area: content;
+  position: relative;
+  margin-left: clamp(20px, 6.6vw, 132px);
+  padding: 104px var(--hs-pad) 16px;
+  border-left: var(--hs-line-size) solid var(--hs-line-color);
+}
+
+@media (min-width: 48em) {
+  .content {
+    display: grid;
+    grid-template-areas: "prevNav" "content" "nextNav";
+    grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+    padding-bottom: 40px;
+  }
+}
+
+/* The beam: a coloured run on the vertical line that tracks scroll progress
+   through the current step. --beam-* are written every frame from JS. */
+.stepTrack {
+  display: none;
+  position: absolute;
+  left: calc(-1 * var(--hs-line-size));
+  top: 0;
+  bottom: 0;
+  width: var(--hs-line-size);
+  --_beam-color: color-mix(in srgb, var(--beam-color) calc(var(--beam-opacity, 1) * 100%), transparent);
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--beam-fade-start, 0) * 100%),
+    var(--_beam-color) min(calc(var(--beam-fade-start, 0) * 100% + var(--beam-fade-top-px, 0px)), calc(var(--beam-end, 0) * 100%)),
+    var(--_beam-color)
+      max(
+        calc(var(--beam-end, 0) * 100% - var(--beam-fade-px, 100px)),
+        min(calc(var(--beam-fade-start, 0) * 100% + var(--beam-fade-top-px, 0px)), calc(var(--beam-end, 0) * 100%))
+      ),
+    transparent calc(var(--beam-end, 0) * 100%)
+  );
+}
+
+@media (min-width: 48em) {
+  .stepTrack {
+    display: block;
+  }
+}
+
+.stepNav {
+  display: none;
+}
+
+@media (min-width: 48em) {
+  .stepNav {
+    display: block;
+  }
+}
+
+.prevNav {
+  grid-area: prevNav;
+  margin-bottom: 16px;
+}
+
+.nextNav {
+  grid-area: nextNav;
+  align-self: end;
+  margin-top: 16px;
+}
+
+.stepPanel {
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ── Step nav (the collapsed 02 / 03 / 04 rows) ─────────────────────────── */
+
+.navList {
+  display: flex;
+  flex-direction: column;
+  row-gap: 12px;
+}
+
+.navPrev > .stepItem {
+  animation: hs-slide-up 0.35s ease-out both;
+}
+
+.navNext > .stepItem {
+  animation: hs-slide-down 0.35s ease-out both;
+}
+
+@keyframes hs-slide-up {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes hs-slide-down {
+  from {
+    opacity: 0;
+    translate: 0 -8px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.stepItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: default;
+}
+
+@media (min-width: 60em) {
+  .stepItem {
+    font-size: 13px;
+  }
+}
+
+.stepItemContent {
+  display: flex;
+  column-gap: 12px;
+}
+
+.stepItemContent > span:first-child {
+  color: #475569;
+}
+
+.stepItemContent > span:last-child {
+  color: #64748b;
+}
+
+.stepItemActive .stepItemContent {
+  clip-path: inset(0 100% 0 0);
+  animation: hs-eyebrow-wipe 0.5s ease-out 0.05s both;
+}
+
+.stepItemActive .stepItemContent > span:first-child {
+  color: #64748b;
+}
+
+.stepItemActive .stepItemContent > span:last-child {
+  color: #e2e8f0;
+}
+
+@keyframes hs-eyebrow-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.marker {
+  position: absolute;
+  left: calc(-1 * var(--hs-pad) - (var(--hs-marker-size) / 2) - (var(--hs-line-size) / 2));
+  width: var(--hs-marker-size);
+  height: var(--hs-marker-size);
+  border-radius: 50%;
+  color: var(--hs-marker-color, #64748b);
+  background-color: currentColor;
+  --_ring: color-mix(in srgb, currentColor 60%, transparent);
+  --_ring-subtle: color-mix(in srgb, currentColor 30%, transparent);
+  box-shadow:
+    0 0 0 3px var(--hs-surface),
+    0 0 0 4px var(--_ring),
+    0 0 0 7px var(--hs-surface);
+}
+
+@media (min-width: 40em) {
+  .markerActive {
+    box-shadow:
+      0 0 0 3px var(--hs-surface),
+      0 0 0 4px var(--_ring),
+      0 0 0 7px var(--hs-surface),
+      0 0 0 8px var(--_ring-subtle),
+      0 0 0 11px var(--hs-surface),
+      0 0 0 11.5px var(--_ring-subtle),
+      0 0 0 14.5px var(--hs-surface);
+  }
+}
+
+/* ── Active panel ───────────────────────────────────────────────────────── */
+
+.panelHeader {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+
+.heading,
+.introHeading {
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  animation: hs-content-enter 0.5s ease-out both;
+  animation-delay: 0.06s;
+}
+
+.heading {
+  font-size: 28px;
+  line-height: 1.12;
+}
+
+.introHeading {
+  font-size: 32px;
+  line-height: 1.1;
+}
+
+.introHeading em {
+  font-style: normal;
+  background: linear-gradient(90deg, #38bdf8, #22d3ee 55%, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (min-width: 60em) {
+  .heading {
+    font-size: 44px;
+  }
+  .introHeading {
+    font-size: 52px;
+  }
+}
+
+.description {
+  max-width: 42ch;
+  margin-top: 12px;
+  color: #cbd5e1;
+  font-size: 15px;
+  line-height: 22px;
+  text-wrap: pretty;
+  animation: hs-content-enter 0.5s ease-out both;
+  animation-delay: 0.12s;
+}
+
+@media (min-width: 60em) {
+  .description {
+    margin-top: 16px;
+    font-size: 18px;
+    line-height: 28px;
+  }
+}
+
+.cta {
+  margin-top: 24px;
+  align-self: flex-start;
+  animation: hs-content-enter 0.5s ease-out both;
+  animation-delay: 0.18s;
+}
+
+@keyframes hs-content-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Right side: the isometric stack ────────────────────────────────────── */
+
+.visual {
+  grid-area: visual;
+  position: relative;
+}
+
+@media (min-width: 48em) {
+  .visual {
+    border-left: var(--hs-line-size) solid var(--hs-line-color);
+    background-image: radial-gradient(circle, var(--hs-line-color) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+}
+
+.stackSvg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  max-width: 460px;
+  transform: translate(-50%, -50%);
+  overflow: visible;
+}
+
+@media (min-width: 48em) {
+  .stackSvg {
+    width: 96%;
+    max-width: 105dvh;
+  }
+}
+
+.stackLayer {
+  --hs-stroke: #26324f;
+  --hs-fill: #17203a;
+  --hs-text: #2b3757;
+  --hs-accent: var(--hs-stroke);
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+}
+
+/* Intro: the whole stack at rest, evenly lit. */
+.stackLayer[data-state="all"] {
+  --hs-stroke: #3d4c72;
+  --hs-fill: #212d4d;
+  --hs-text: #46557c;
+}
+
+.stackLayer[data-state="active"] {
+  --hs-stroke: #c3cee4;
+  --hs-fill: #56648a;
+  --hs-text: #93a3c4;
+  --hs-accent: var(--hs-accent-on);
+}
+
+.layerArt * {
+  transition:
+    fill 0.4s ease-out,
+    stroke 0.4s ease-out;
+}
+
+.layerArt text {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  letter-spacing: 0.04em;
+}
+
+.layerAnnotations {
+  pointer-events: none;
+}
+
+.layerAnnotations text {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  fill: #f1f5f9;
+  opacity: 0;
+}
+
+.layerAnnotations circle {
+  opacity: 0;
+}
+
+.layerAnnotations path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.stackLayer[data-state="active"] .layerAnnotations circle {
+  animation: hs-fade-in 0.3s ease-out 0.6s forwards;
+}
+
+.stackLayer[data-state="active"] .layerAnnotations path {
+  animation: hs-line-in 0.55s ease-out 0.1s forwards;
+}
+
+.stackLayer[data-state="active"] .layerAnnotations text {
+  animation: hs-fade-in 0.3s ease-out 0.6s forwards;
+}
+
+@keyframes hs-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hs-line-in {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
