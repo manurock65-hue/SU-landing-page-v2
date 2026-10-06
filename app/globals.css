@@ -115,6 +115,16 @@
   animation: ai-flow 8s linear infinite;
 }
 
+/* Hero deck agent-panel feed: scrolls internally so a richer run never grows
+   the card past the deck's fixed height, but the scrollbar itself is hidden. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Recognition cards: a conic glow on the border that points at the cursor
    (pattern from Aceternity's "Glowing Effect" on 21st.dev). The card sets
    --glow-angle (deg) and --glow-on (0/1); the mask keeps only the 1.5px ring. */
