@@ -7,7 +7,11 @@ import { Check } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 
-const STEP_MS = 2200;
+// Exported so the deck (function-deck.tsx) can size its own shuffle timer to
+// match: panels.length * STEP_MS + RUN_HOLD_MS is exactly how long a run
+// takes to finish and sit on its result.
+export const STEP_MS = 2200;
+export const RUN_HOLD_MS = 2000;
 // Tall enough for the richest panel (a 3-source retrieval list) with a little
 // headroom — fixed so switching panels never resizes the card around it.
 const STAGE_H = 212;
@@ -268,51 +272,54 @@ function RunSummary({ headline, footer }: { headline: string; footer: AgentRun["
           transition: { type: "spring", stiffness: 480, damping: 24, mass: 0.6, staggerChildren: 0.09, delayChildren: 0.18 },
         },
       }}
-      className="absolute inset-0 flex flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-emerald-200 bg-emerald-50/50 px-6 text-center"
+      className="absolute inset-0 overflow-hidden rounded-xl border border-emerald-200/80 bg-gradient-to-b from-white to-emerald-50/70"
     >
-      {/* Success sonar — soft rings keep pulsing outward while the result holds. */}
-      <span className="relative grid size-9 place-items-center">
-        {!reduceMotion &&
-          [0, 0.6].map((delay) => (
+      {/* A finished-case band across the top, same language as the live-ring on the other panels. */}
+      <div aria-hidden="true" className="h-[3px] w-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-cyan-400" />
+
+      <div className="flex h-[calc(100%-3px)] flex-col items-center justify-center gap-3 px-6 text-center">
+        {/* A single soft breathing glow behind the badge — steady, no reset-jump. */}
+        <span className="relative grid size-11 place-items-center">
+          {!reduceMotion && (
             <motion.span
-              key={delay}
               aria-hidden="true"
-              initial={{ scale: 0.6, opacity: 0.5 }}
-              animate={{ scale: 2.1, opacity: 0 }}
-              transition={{ duration: 1.8, ease: "easeOut", repeat: Infinity, delay: delay + 0.4 }}
+              animate={{ scale: [1, 1.45, 1], opacity: [0.4, 0, 0.4] }}
+              transition={{ duration: 2.4, ease: "easeInOut", repeat: Infinity, delay: 0.5 }}
               className="absolute inset-0 rounded-full bg-emerald-400"
             />
-          ))}
-        <motion.span
-          initial={{ scale: 0 }}
-          animate={{ scale: [0, 1.2, 1] }}
-          transition={{ duration: 0.4, times: [0, 0.65, 1], ease: "easeOut", delay: 0.05 }}
-          className="relative grid size-9 place-items-center rounded-full bg-emerald-100 text-emerald-600"
-        >
-          <Check className="size-5" strokeWidth={3} />
-        </motion.span>
-      </span>
-
-      <motion.p variants={summaryItem} className="text-[14px] font-semibold leading-snug text-slate-900">
-        {headline}
-      </motion.p>
-      <motion.div variants={summaryItem} className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 font-mono text-[10.5px]">
-        {footer.map((f, i) => (
-          <span
-            key={i}
-            className={cn(
-              i > 0 && "before:mr-2.5 before:text-slate-300 before:content-['·']",
-              f.tone === "green" ? "font-semibold text-emerald-600" : "text-slate-500",
-            )}
+          )}
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: [0, 1.2, 1] }}
+            transition={{ duration: 0.4, times: [0, 0.65, 1], ease: "easeOut", delay: 0.05 }}
+            className="relative grid size-11 place-items-center rounded-full bg-emerald-500 text-white shadow-[0_10px_24px_-8px_rgba(16,185,129,0.65)]"
           >
-            {f.text}
-          </span>
-        ))}
-        <span className="flex items-center gap-1 font-semibold text-emerald-600 before:mr-2.5 before:text-slate-300 before:content-['·']">
-          <Check className="size-3" strokeWidth={3} />
-          logged
+            <Check className="size-5" strokeWidth={3} />
+          </motion.span>
         </span>
-      </motion.div>
+
+        <motion.p variants={summaryItem} className="text-[15px] font-bold leading-snug text-slate-900">
+          {headline}
+        </motion.p>
+
+        <motion.div variants={summaryItem} className="flex flex-wrap items-center justify-center gap-1.5">
+          {footer.map((f, i) => (
+            <span
+              key={i}
+              className={cn(
+                "rounded-full border px-2.5 py-1 font-mono text-[10px] font-medium",
+                f.tone === "green" ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-500",
+              )}
+            >
+              {f.text}
+            </span>
+          ))}
+          <span className="flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-mono text-[10px] font-semibold text-emerald-700">
+            <Check className="size-2.5" strokeWidth={3} />
+            logged
+          </span>
+        </motion.div>
+      </div>
     </motion.div>
   );
 }

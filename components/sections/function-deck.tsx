@@ -1,6 +1,6 @@
 "use client";
 
-import { AgentRunPanels } from "@/components/sections/agent-run-panels";
+import { AgentRunPanels, RUN_HOLD_MS, STEP_MS } from "@/components/sections/agent-run-panels";
 import { HERO_EXAMPLES, HERO_DEFAULT_INDEX, type Fn } from "@/lib/functions-data";
 import { HERO_RUNS, type AgentRun } from "@/lib/hero-runs";
 import { cn } from "@/lib/utils";
@@ -11,7 +11,6 @@ import { useEffect, useRef, useState } from "react";
 // run, then swipes out to the left and fades while the rest step forward; it
 // re-enters invisibly at the back. Pauses on hover/focus and while off screen.
 const TABS = ["DEFLECT", "ASSIST", "OPERATE"] as const;
-const SHUFFLE_MS = 11000; // enough to step through the richest run (4 panels) and hold on the result
 const TUCK_MS = 480; // how long the leaving card takes to swipe out
 const PEEK = 16; // px each card behind peeks out above the one in front
 const VISIBLE = 4; // cards drawn behind the front one fade out past this depth
@@ -84,15 +83,19 @@ export function FunctionDeck({ className }: { className?: string }) {
 
   const top = order[0];
   const autoplay = inView && !paused && !reduceMotion;
+  // How long the top card's own run takes to play out and sit on its result —
+  // the deck waits exactly that long before moving on, instead of a fixed
+  // timer that either cuts a long run short or sits idle after a short one.
+  const topShuffleMs = HERO_RUNS[top].panels.length * STEP_MS + RUN_HOLD_MS;
 
   useEffect(() => {
     if (!autoplay) return;
     const t = setTimeout(() => {
       setLeaving(top);
       setOrder((o) => [...o.slice(1), o[0]]);
-    }, SHUFFLE_MS);
+    }, topShuffleMs);
     return () => clearTimeout(t);
-  }, [autoplay, top]);
+  }, [autoplay, top, topShuffleMs]);
 
   useEffect(() => {
     if (leaving === null) return;
@@ -169,6 +172,7 @@ export function FunctionDeck({ className }: { className?: string }) {
                 playing={isTop && inView}
                 dim={!isTop && !tucking}
                 countdown={isTop && autoplay}
+                shuffleMs={HERO_RUNS[i].panels.length * STEP_MS + RUN_HOLD_MS}
                 onTabSelect={goToTab}
               />
             </motion.div>
@@ -211,6 +215,7 @@ function DeckCard({
   playing,
   dim,
   countdown,
+  shuffleMs,
   onTabSelect,
 }: {
   fn: Fn;
@@ -219,6 +224,7 @@ function DeckCard({
   playing: boolean;
   dim: boolean;
   countdown: boolean;
+  shuffleMs: number;
   onTabSelect: (tab: AgentRun["tab"]) => void;
 }) {
   const glowRef = useGlowBorder(active);
@@ -303,7 +309,7 @@ function DeckCard({
             <motion.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
-              transition={{ duration: SHUFFLE_MS / 1000, ease: "linear" }}
+              transition={{ duration: shuffleMs / 1000, ease: "linear" }}
               className="h-full origin-left rounded-full bg-gradient-to-r from-[#005be2] to-[#06b6d4]"
             />
           )}
