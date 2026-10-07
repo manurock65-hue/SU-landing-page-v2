@@ -27,7 +27,9 @@
 .layout {
   display: grid;
   grid-template-areas: "content" "visual";
-  grid-template-rows: minmax(0, 300px) minmax(0, 2fr);
+  /* Phones: the text row is sized for the longest step (heading, copy and the
+     closing CTA), so the artwork below never has to share space with it. */
+  grid-template-rows: minmax(0, 384px) minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr);
   height: 100%;
 }
@@ -43,6 +45,7 @@
 .content {
   grid-area: content;
   position: relative;
+  z-index: 1;
   margin-left: clamp(20px, 6.6vw, 132px);
   padding: 104px var(--hs-pad) 16px;
   border-left: var(--hs-line-size) solid var(--hs-line-color);
@@ -254,8 +257,15 @@
 }
 
 .heading {
-  font-size: 28px;
-  line-height: 1.12;
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+@media (min-width: 48em) {
+  .heading {
+    font-size: 28px;
+    line-height: 1.12;
+  }
 }
 
 .introHeading {
@@ -322,6 +332,17 @@
   position: relative;
 }
 
+/* Phones: the parked layers above and below the active one are taller than
+   this row. Clip them to it and fade the top edge, so the stack reads as
+   rising out from under the text instead of running over it. */
+@media (max-width: 47.99em) {
+  .visual {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 56px);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 56px);
+  }
+}
+
 @media (min-width: 48em) {
   .visual {
     border-left: var(--hs-line-size) solid var(--hs-line-color);
@@ -336,6 +357,7 @@
   top: 50%;
   width: 100%;
   max-width: 460px;
+  max-height: 100%;
   transform: translate(-50%, -50%);
   overflow: visible;
 }
@@ -383,6 +405,32 @@
 
 .layerAnnotations {
   pointer-events: none;
+}
+
+/* The artwork scales with the viewport, and its call-out labels with it. Past
+   a laptop-sized screen that makes them oversized, so step them back down to
+   roughly the same on-screen size. */
+.annotationLabel {
+  transform-box: view-box;
+  scale: var(--hs-label-scale, 1);
+}
+
+@media (min-width: 100em) {
+  .root {
+    --hs-label-scale: 0.85;
+  }
+}
+
+@media (min-width: 120em) {
+  .root {
+    --hs-label-scale: 0.75;
+  }
+}
+
+@media (min-width: 150em) {
+  .root {
+    --hs-label-scale: 0.62;
+  }
 }
 
 .layerAnnotations text {

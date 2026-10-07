@@ -426,14 +426,18 @@ function Annotations({ labels, accent }: { labels: string[]; accent: string }) {
               pathLength={1}
               vectorEffect={NS}
             />
-            <circle cx={dotX} cy={slot.y} r={4} fill={accent} />
-            <text x={textX} y={slot.y + 5}>
-              {lines.map((l, j) => (
-                <tspan key={l} x={textX} dy={j === 0 ? 0 : 18}>
-                  {l}
-                </tspan>
-              ))}
-            </text>
+            {/* Scaled about the leader line's end, so the label can shrink on
+                large screens (see --hs-label-scale) and stay attached to it. */}
+            <g className={s.annotationLabel} style={{ transformOrigin: `${slot.x}px ${slot.y}px` }}>
+              <circle cx={dotX} cy={slot.y} r={4} fill={accent} />
+              <text x={textX} y={slot.y + 5}>
+                {lines.map((l, j) => (
+                  <tspan key={l} x={textX} dy={j === 0 ? 0 : 18}>
+                    {l}
+                  </tspan>
+                ))}
+              </text>
+            </g>
           </g>
         );
       })}
