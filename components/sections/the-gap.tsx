@@ -1,18 +1,15 @@
 "use client";
 
 import { DotGridBackground } from "@/components/ui/dot-grid-background";
-import { cn } from "@/lib/utils";
-import { Bot, CheckCircle2, FileCheck2, HelpCircle, MessageSquareText, Users, Wrench, Workflow, type LucideIcon } from "lucide-react";
-import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { ArrowDown, Bot, CheckCircle2, FileCheck2, HelpCircle, MessageSquareText, Users, Wrench, Workflow, type LucideIcon } from "lucide-react";
+import { motion } from "motion/react";
 
 // "Most AI support pilots stall for four reasons." Four market-claim vs.
-// SearchUnify-reality pairs, copy mirrors the live site verbatim. Redesigned
-// as a tab-picker + a single physical toggle switch that flips one pair's
-// content between "what got sold" and "what SearchUnify does" — one thing on
-// screen at a time, easier to follow than four cards read all at once.
+// SearchUnify-reality pairs, copy mirrors the live site verbatim. All four are
+// on screen at once as split cards: what got sold on top, struck through, and
+// what SearchUnify does instead underneath. The seam between the two halves
+// lines up across the row, so the section reads as one before/after band.
 const ease = [0.22, 1, 0.36, 1] as const;
-const AUTO_FLIP_MS = 2600;
 
 type Pair = {
   title: string;
@@ -64,36 +61,6 @@ const PAIRS: Pair[] = [
 ];
 
 export function TheGap() {
-  const [active, setActive] = useState(0);
-  const [side, setSide] = useState<"market" | "us">("market");
-  const [interacted, setInteracted] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { amount: 0.5 });
-  const reduceMotion = useReducedMotion();
-  const pair = PAIRS[active];
-
-  // Demo the switch once per pair: flip to "us" shortly after it's shown,
-  // unless the reader has already touched the control themselves.
-  useEffect(() => {
-    if (interacted || reduceMotion || !inView) return;
-    const t = setTimeout(() => setSide("us"), AUTO_FLIP_MS);
-    return () => clearTimeout(t);
-  }, [active, interacted, reduceMotion, inView]);
-
-  const selectPair = (i: number) => {
-    setActive(i);
-    setSide("market");
-    setInteracted(false);
-  };
-
-  const flip = (next: "market" | "us") => {
-    setSide(next);
-    setInteracted(true);
-  };
-
-  const onMarket = side === "market";
-  const Icon = onMarket ? pair.marketIcon : pair.usIcon;
-
   return (
     <section aria-labelledby="gap-heading" className="relative overflow-hidden bg-slate-50 px-6 py-24 sm:py-32">
       <DotGridBackground />
@@ -110,108 +77,78 @@ export function TheGap() {
         </p>
       </div>
 
-      {/* Tabs — pick which pair is on the switch below. */}
-      <div role="tablist" aria-label="Comparisons" className="mx-auto mt-12 flex max-w-3xl flex-wrap justify-center gap-2">
-        {PAIRS.map((p, i) => {
-          const isActive = i === active;
-          return (
-            <button
-              key={p.title}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => selectPair(i)}
-              className={cn(
-                "rounded-full border px-4 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#005be2]/40",
-                isActive
-                  ? "border-[#005be2] bg-[#005be2] text-white shadow-[0_8px_20px_-8px_rgba(0,91,226,0.6)]"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-950",
-              )}
-            >
-              <span className="tabular-nums text-xs opacity-70">0{i + 1}</span> {p.title}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* The switch itself. */}
-      <div ref={ref} className="mx-auto mt-10 max-w-2xl">
-        <div
-          role="group"
-          aria-label="What got sold, vs. what SearchUnify does"
-          className={cn(
-            "relative mx-auto flex w-full max-w-md items-center rounded-full border p-1 transition-colors duration-500",
-            onMarket ? "border-rose-200 bg-rose-50" : "border-emerald-200 bg-emerald-50",
-          )}
-        >
-          <motion.span
-            aria-hidden="true"
-            animate={{ x: onMarket ? "0%" : "100%" }}
-            transition={{ duration: 0.45, ease }}
-            className="absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-white shadow-[0_6px_16px_-6px_rgba(15,23,42,0.35)]"
-          />
-          <button
-            type="button"
-            onClick={() => flip("market")}
-            aria-pressed={onMarket}
-            className={cn(
-              "relative z-10 flex-1 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors duration-300",
-              onMarket ? "text-rose-600" : "text-slate-400 hover:text-slate-600",
-            )}
+      {/* Each card spans the grid's three shared rows (sold · seam · SearchUnify),
+          so the halves stay level across the row however long the copy runs. */}
+      <ol className="relative mx-auto mt-14 grid max-w-7xl gap-x-5 gap-y-6 sm:grid-cols-2 xl:grid-cols-4">
+        {PAIRS.map((p, i) => (
+          <motion.li
+            key={p.title}
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.6, ease, delay: i * 0.1 }}
+            className="group row-span-3 grid grid-rows-subgrid gap-y-0 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.45)] transition-[border-color,box-shadow] duration-500 hover:border-[#005be2]/40 hover:shadow-[0_32px_70px_-36px_rgba(0,91,226,0.55)]"
           >
-            What got sold
-          </button>
-          <button
-            type="button"
-            onClick={() => flip("us")}
-            aria-pressed={!onMarket}
-            className={cn(
-              "relative z-10 flex-1 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors duration-300",
-              !onMarket ? "text-emerald-600" : "text-slate-400 hover:text-slate-600",
-            )}
-          >
-            What SearchUnify does
-          </button>
-        </div>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`${active}-${side}`}
-            initial={{ opacity: 0, y: 16, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -12, scale: 0.98 }}
-            transition={{ duration: 0.35, ease }}
-            className={cn(
-              "relative mt-6 overflow-hidden rounded-3xl border bg-white p-8 shadow-[0_24px_60px_-32px_rgba(15,23,42,0.35)] transition-colors duration-500 sm:p-10",
-              onMarket ? "border-rose-200/70" : "border-emerald-200/70",
-            )}
-          >
-            <div
-              aria-hidden="true"
-              className={cn(
-                "pointer-events-none absolute -right-20 -top-20 size-64 rounded-full blur-3xl transition-colors duration-500",
-                onMarket ? "bg-rose-200/40" : "bg-emerald-200/40",
-              )}
-            />
-            <div className="relative flex items-center gap-4">
-              <span
-                className={cn(
-                  "grid size-12 shrink-0 place-items-center rounded-2xl transition-colors duration-500",
-                  onMarket ? "bg-rose-100 text-rose-600" : "bg-emerald-100 text-emerald-600",
-                )}
-              >
-                <Icon className="size-6" />
-              </span>
-              <p className={cn("text-xl font-bold transition-colors duration-500", onMarket ? "text-rose-600" : "text-emerald-600")}>
-                {onMarket ? pair.marketLabel : pair.usLabel}
+            {/* What got sold */}
+            <div className="p-6 pb-9">
+              <p className="flex items-baseline gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-950">
+                <span className="font-mono text-slate-400">0{i + 1}</span>
+                {p.title}
               </p>
+              <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">What got sold</p>
+              <div className="mt-2.5 flex items-center gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-400">
+                  <p.marketIcon className="size-5" />
+                </span>
+                <h3 className="text-lg font-bold leading-tight text-slate-500 line-through decoration-rose-400/80 decoration-2">
+                  {p.marketLabel}
+                </h3>
+              </div>
+              <p className="mt-3.5 text-pretty text-sm leading-relaxed text-slate-500">{p.market}</p>
             </div>
-            <p className="relative mt-5 text-pretty text-lg leading-relaxed text-slate-700">
-              {onMarket ? pair.market : pair.us}
-            </p>
-          </motion.div>
-        </AnimatePresence>
-      </div>
+
+            {/* The seam: where the pitch ends and the product starts. */}
+            <div aria-hidden="true" className="relative z-10 h-0">
+              <span className="absolute left-6 top-0 inline-flex -translate-y-1/2 items-center gap-1.5 rounded-full border border-[#005be2]/25 bg-white py-1 pl-1 pr-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#005be2] shadow-[0_6px_16px_-8px_rgba(0,91,226,0.6)]">
+                <span className="grid size-5 place-items-center rounded-full bg-[#005be2] text-white transition-transform duration-500 group-hover:translate-y-0.5">
+                  <ArrowDown className="size-3" strokeWidth={3} />
+                </span>
+                Instead
+              </span>
+            </div>
+
+            {/* What SearchUnify does — fills with the brand gradient on hover. */}
+            <div className="relative border-t border-[#005be2]/15 bg-gradient-to-br from-[#005be2]/[0.07] to-cyan-400/[0.09] p-6 pt-9">
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-gradient-to-br from-[#005be2] to-[#0891d1] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              />
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{ duration: 0.6, ease, delay: 0.35 + i * 0.1 }}
+                className="relative"
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#005be2] transition-colors duration-500 group-hover:text-white/75">
+                  With SearchUnify
+                </p>
+                <div className="mt-2.5 flex items-center gap-3">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#005be2] text-white shadow-[0_8px_20px_-8px_rgba(0,91,226,0.7)] transition-colors duration-500 group-hover:bg-white group-hover:text-[#005be2]">
+                    <p.usIcon className="size-5" />
+                  </span>
+                  <h3 className="text-lg font-bold leading-tight text-slate-950 transition-colors duration-500 group-hover:text-white">
+                    {p.usLabel}
+                  </h3>
+                </div>
+                <p className="mt-3.5 text-pretty text-sm leading-relaxed text-slate-700 transition-colors duration-500 group-hover:text-white/90">
+                  {p.us}
+                </p>
+              </motion.div>
+            </div>
+          </motion.li>
+        ))}
+      </ol>
     </section>
   );
 }
